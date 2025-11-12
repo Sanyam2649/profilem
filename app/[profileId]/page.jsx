@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import PortfolioClient from '@/components/portofolio/PortfolioClient';
 
 export default async function PortfolioPage({ params }) {
-  const { profileId } = await params;
+  const { profileId } = params;
 
   if (!profileId) {
     notFound();
