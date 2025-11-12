@@ -570,17 +570,8 @@ const Navbar = () => {
               onClick={closeModals}
             >
               <X className="w-4 h-4" />
-            </button>
-            
-            <div className="text-center mb-6 pt-8 px-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Key className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-bold text-2xl text-slate-800 mb-2">Welcome Back</h3>
-              <p className="text-slate-600">Sign in to your account</p>
-            </div>
-            
-            <div className="px-6 pb-6 text-black">
+            </button>            
+            <div className="px-6 py-6 text-black">
               <LoginForm
                 onSuccess={handleLoginSuccess}
                 onClose={closeModals}
@@ -601,17 +592,8 @@ const Navbar = () => {
               onClick={closeModals}
             >
               <X className="w-4 h-4" />
-            </button>
-            
-            <div className="text-center mb-6 pt-8 px-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <UserIcon className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-bold text-2xl text-slate-800 mb-2">Create Account</h3>
-              <p className="text-slate-600">Join us today</p>
-            </div>
-            
-            <div className="px-6 pb-6">
+            </button>  
+            <div className="px-6 py-6 text-black overflow-y-auto">
               <RegisterModal
                 onSwitchToLogin={openLoginFromRegister}
                 onSuccess={handleRegisterSuccess}
