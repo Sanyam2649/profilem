@@ -9,12 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.1",
+    "@sparticuz/chromium": "^141.0.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
     "daisyui": "^5.5.0",
+    "html2pdf.js": "^0.12.1",
     "lucide-react": "^0.553.0",
     "mongoose": "^8.19.3",
     "next": "16.0.1",
+    "puppeteer": "^24.29.1",
+    "puppeteer-core": "^24.29.1",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },

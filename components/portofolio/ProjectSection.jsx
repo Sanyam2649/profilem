@@ -45,6 +45,7 @@ const ProjectsSection = ({ projects }) => {
     
     return techColors[tech] || 'from-purple-500 to-pink-500';
   };
+  
 
   const getProjectStatus = (startDate, endDate) => {
     if (!endDate) return 'active';
@@ -55,254 +56,209 @@ const ProjectsSection = ({ projects }) => {
     ? projects 
     : projects.filter(project => getProjectStatus(project.startDate, project.endDate) === filter);
 
-  return (
-    <section className="relative py-20 px-6">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-cyan-50/50"></div>
-      
-      <div className="container mx-auto max-w-7xl relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-emerald-200/50 mb-6">
-            <Code className="w-5 h-5 text-emerald-600" />
-            <span className="text-sm font-semibold text-gray-700">Portfolio Showcase</span>
-          </div>
-          <h2 className="text-5xl font-black bg-gradient-to-r from-gray-900 to-emerald-800 bg-clip-text text-transparent mb-6">
-            Featured Projects
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Building innovative solutions and bringing ideas to life through cutting-edge technology
-          </p>
+ return (
+  <section className="relative py-16 px-4 sm:px-6">
+    {/* Background */}
+    <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-cyan-50/50" />
+
+    <div className="relative max-w-6xl mx-auto z-10">
+      {/* Header */}
+      <div className="text-center mb-10 sm:mb-16">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 rounded-xl shadow border mb-4">
+          <Code className="w-4 h-4 text-emerald-600" />
+          <span className="text-xs sm:text-sm font-semibold text-gray-700">
+            Portfolio Showcase
+          </span>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-gray-200/50">
-            <div className="flex space-x-2">
-              {[
-                { key: 'all', label: 'All Projects', count: projects.length },
-                { key: 'active', label: 'Active', count: projects.filter(p => !p.endDate).length },
-                { key: 'completed', label: 'Completed', count: projects.filter(p => p.endDate).length }
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setFilter(tab.key)}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                    filter === tab.key
-                      ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
+        <h2 className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-gray-900 to-emerald-800 bg-clip-text text-transparent mb-4">
+          Featured Projects
+        </h2>
+
+        <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Innovative builds crafted with modern technologies and precision.
+        </p>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex justify-center mb-10">
+        <div className="bg-white/80 rounded-xl p-1 sm:p-2 shadow border flex gap-1 sm:gap-2">
+          {[
+            { key: "all", label: "All", count: projects.length },
+            { key: "active", label: "Active", count: projects.filter(p => !p.endDate).length },
+            { key: "completed", label: "Completed", count: projects.filter(p => p.endDate).length },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-all ${
+                filter === tab.key
+                  ? "bg-emerald-500 text-white shadow"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Projects Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+        {filteredProjects.map((project, index) => {
+          const status = getProjectStatus(project.startDate, project.endDate);
+
+          return (
+            <div
+              key={index}
+              className="bg-white rounded-2xl p-5 shadow border flex flex-col hover:shadow-lg transition-all"
+            >
+              {/* Title */}
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow text-white">
+                    <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg sm:text-xl text-gray-900">
+                      {project.name}
+                    </h3>
+                    {project.startDate && (
+                      <p className="text-gray-500 text-xs sm:text-sm flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {project.endDate
+                          ? `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`
+                          : `Started ${formatDate(project.startDate)}`}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <span
+                  className={`px-2 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 border ${
+                    status === "active"
+                      ? "bg-orange-50 text-orange-700 border-orange-200"
+                      : "bg-green-50 text-green-700 border-green-200"
                   }`}
                 >
-                  {tab.label} ({tab.count})
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
-          {filteredProjects.map((project, index) => {
-            const isHovered = hoveredProject === index;
-            const status = getProjectStatus(project.startDate, project.endDate);
-            
-            return (
-              <div
-                key={index}
-                className="group relative"
-                onMouseEnter={() => setHoveredProject(index)}
-                onMouseLeave={() => setHoveredProject(null)}
-              >
-                {/* Background Glow */}
-                <div className={`absolute -inset-4 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${
-                  isHovered ? 'opacity-20' : ''
-                }`}></div>
-                
-                <div className={`bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-gray-200/50 transition-all duration-500 h-full flex flex-col relative z-10 ${
-                  isHovered ? 'transform scale-105 shadow-3xl border-emerald-200' : ''
-                }`}>
-                  
-                  {/* Project Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Zap className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-black text-gray-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
-                          {project.name}
-                        </h3>
-                        {project.startDate && (
-                          <div className="flex items-center gap-2 text-gray-500 text-sm">
-                            <Calendar className="w-4 h-4" />
-                            <span>
-                              {project.endDate 
-                                ? `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`
-                                : `Started ${formatDate(project.startDate)}`
-                              }
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Status Badge */}
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
-                      status === 'active'
-                        ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                        : 'bg-green-50 text-green-700 border border-green-200'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full ${
-                        status === 'active' ? 'bg-orange-500 animate-pulse' : 'bg-green-500'
-                      }`}></div>
-                      <span>{status === 'active' ? 'Active' : 'Completed'}</span>
-                    </div>
-                  </div>
-
-                  {/* Duration */}
-                  {project.startDate && (
-                    <div className="mb-4">
-                      <div className="inline-flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-600 rounded-xl text-sm font-semibold">
-                        <Clock className="w-4 h-4" />
-                        <span>{getProjectDuration(project.startDate, project.endDate)}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Description */}
-                  <div className="mb-6 flex-1">
-                    <p className="text-gray-700 leading-relaxed line-clamp-3">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Technologies */}
-                  {project.technologies && project.technologies.length > 0 && (
-                    <div className="mb-6">
-                      <div className="flex flex-wrap gap-2">
-                        {project.technologies.slice(0, 5).map((tech, idx) => (
-                          <span
-                            key={idx}
-                            className={`px-3 py-1.5 bg-gradient-to-r ${getTechColor(tech)} text-white rounded-lg text-xs font-semibold shadow-lg transform transition-transform duration-300 ${
-                              isHovered ? 'scale-105' : 'scale-100'
-                            }`}
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                        {project.technologies.length > 5 && (
-                          <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
-                            +{project.technologies.length - 5}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Project Links */}
-                  <div className="pt-4 border-t border-gray-200/50">
-                    <div className="flex items-center gap-3">
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-300 flex-1 justify-center group/link shadow-lg hover:shadow-xl"
-                        >
-                          <Play className="w-4 h-4" />
-                          <span className="font-semibold">Live Demo</span>
-                          <ArrowUpRight className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity duration-300" />
-                        </a>
-                      )}
-                      
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl"
-                        >
-                          <Github className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      status === "active" ? "bg-orange-500 animate-pulse" : "bg-green-500"
+                    }`}
+                  ></span>
+                  {status === "active" ? "Active" : "Completed"}
+                </span>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Enhanced Projects Summary */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 shadow-2xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-3">
-                <Code className="w-8 h-8 text-emerald-600" />
-                <div className="text-4xl font-black text-gray-900">{projects.length}</div>
-              </div>
-              <div className="text-lg text-gray-600 font-semibold">Total Projects</div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-3">
-                <Zap className="w-8 h-8 text-orange-500" />
-                <div className="text-4xl font-black text-gray-900">
-                  {projects.filter(p => !p.endDate).length}
-                </div>
-              </div>
-              <div className="text-lg text-gray-600 font-semibold">Active Projects</div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-3">
-                <Star className="w-8 h-8 text-amber-500" />
-                <div className="text-4xl font-black text-gray-900">
-                  {Array.from(new Set(projects.flatMap(p => p.technologies || []))).length}+
-                </div>
-              </div>
-              <div className="text-lg text-gray-600 font-semibold">Technologies</div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-3">
-                <ExternalLink className="w-8 h-8 text-blue-500" />
-                <div className="text-4xl font-black text-gray-900">
-                  {projects.filter(p => p.link).length}
-                </div>
-              </div>
-              <div className="text-lg text-gray-600 font-semibold">Live Demos</div>
-            </div>
-          </div>
-
-          {/* Technology Diversity Chart */}
-          <div className="mt-8 pt-8 border-t border-gray-200/50">
-            <h4 className="text-lg font-bold text-gray-900 mb-4 text-center">Technology Distribution</h4>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {Array.from(new Set(projects.flatMap(p => p.technologies || [])))
-                .slice(0, 8)
-                .map((tech, idx) => (
-                  <div key={tech} className="flex items-center gap-2">
-                    <div 
-                      className={`w-3 h-3 rounded-full bg-gradient-to-r ${getTechColor(tech)}`}
-                    ></div>
-                    <span className="text-sm font-medium text-gray-700">{tech}</span>
-                  </div>
-                ))}
-              {Array.from(new Set(projects.flatMap(p => p.technologies || []))).length > 8 && (
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-700">
-                    +{Array.from(new Set(projects.flatMap(p => p.technologies || []))).length - 8} more
+              {/* Duration */}
+              {project.startDate && (
+                <div className="mb-4">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
+                    <Clock className="w-4 h-4" />
+                    {getProjectDuration(project.startDate, project.endDate)}
                   </span>
                 </div>
               )}
+
+              {/* Description */}
+              <p className="text-gray-700 text-sm sm:text-base mb-4 line-clamp-3">
+                {project.description}
+              </p>
+
+              {/* Tech Stack */}
+              {project.technologies?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {project.technologies.slice(0, 4).map((tech, i) => (
+                    <span
+                      key={i}
+                      className={`px-3 py-1 text-xs font-semibold rounded-lg text-white bg-gradient-to-r ${getTechColor(
+                        tech
+                      )}`}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  {project.technologies.length > 4 && (
+                    <span className="px-3 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">
+                      +{project.technologies.length - 4}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Links */}
+              <div className="flex gap-3 mt-auto pt-4 border-t">
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600"
+                  >
+                    <Play className="w-4 h-4" />
+                    Live Demo
+                  </a>
+                )}
+
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    className="px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 flex items-center justify-center"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          );
+        })}
+      </div>
+
+      {/* Summary */}
+      <div className="mt-16 p-6 sm:p-10 bg-white rounded-3xl shadow border">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10 text-center">
+          <SummaryStat
+            icon={<Code className="w-6 h-6 text-emerald-600" />}
+            value={projects.length}
+            label="Total Projects"
+          />
+          <SummaryStat
+            icon={<Zap className="w-6 h-6 text-orange-500" />}
+            value={projects.filter(p => !p.endDate).length}
+            label="Active"
+          />
+          <SummaryStat
+            icon={<Star className="w-6 h-6 text-amber-500" />}
+            value={Array.from(new Set(projects.flatMap(p => p.technologies))).length}
+            label="Technologies"
+          />
+          <SummaryStat
+            icon={<ExternalLink className="w-6 h-6 text-blue-600" />}
+            value={projects.filter(p => p.link).length}
+            label="Live Demos"
+          />
         </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
+
+
 };
 
 export default ProjectsSection;
+
+  const SummaryStat = ({ icon, value, label }) => (
+  <div className="space-y-3">
+    <div className="flex items-center justify-center gap-3">
+      {icon}
+      <div className="text-3xl sm:text-4xl font-black text-gray-900">
+        {value}
+      </div>
+    </div>
+    <div className="text-sm sm:text-lg text-gray-600 font-semibold">
+      {label}
+    </div>
+  </div>
+);

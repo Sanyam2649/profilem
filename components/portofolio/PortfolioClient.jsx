@@ -61,7 +61,7 @@ export default function PortfolioClient({ profileId }) {
   const setSectionRef = (element, id) => {
     sectionRefs.current[id] = element;
   };
-
+  
   // Loading animation
   if (isLoading)
     return (
@@ -97,12 +97,14 @@ export default function PortfolioClient({ profileId }) {
 
       {/* Print Button */}
       <button
-        onClick={() => window.print()}
-        className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium shadow-lg hover:scale-105 transition-all duration-300 z-50"
-      >
-        <Download className="w-5 h-5" />
-        <span>Download</span>
-      </button>
+   onClick={() => {
+    window.location.href = `/api/resume/pdf?profileId=${profileId}`;
+  }}
+  className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium shadow-lg hover:scale-105 transition-all duration-300 z-50"
+>
+  <Download className="w-5 h-5" />
+  <span>Download</span>
+</button>
 
       {/* Profile Content */}
       <main className="relative z-10 transition-opacity duration-700 opacity-100">
