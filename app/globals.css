@@ -1,24 +1,2 @@
 @import "tailwindcss";
 @plugin "daisyui";
-
-/* Keep original color styles in print */
-@media print {
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  body {
-    background: white !important;
-  }
-
-  button,
-  nav,
-  .no-print {
-    display: none !important;
-  }
-
-  section {
-    page-break-inside: avoid;
-  }
-}

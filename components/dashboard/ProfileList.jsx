@@ -54,16 +54,16 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
             <div className="avatar placeholder">
              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">
-                  {profile.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
+                  {profile.personal.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
                 </span>
               </div>
             </div>
             <div>
               <h4 className="font-bold text-gray-800 text-lg">
-                {profile.name || 'Unnamed Profile'}
+                {profile.personal.name || 'Unnamed Profile'}
               </h4>
               <p className="text-sm text-gray-600">
-                {profile.email || 'No email'}
+                {profile.personal.email || 'No email'}
               </p>
             </div>
           </div>
@@ -178,12 +178,14 @@ const ProfileList = ({
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = 10;
+  
+  console.log(profiles);
 
   // Filter profiles based on search
   const filteredProfiles = profiles.filter(profile =>
-    profile.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.location?.toLowerCase().includes(searchTerm.toLowerCase())
+    profile.personal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    profile.personal.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    profile.personal.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
@@ -253,7 +255,7 @@ const ProfileList = ({
                 </thead>
                 <tbody>
                   {currentProfiles.map((profile, index) => (
-                    <tr key={profile._id || profile.email} className="hover:bg-blue-50/80 transition-all duration-200 border-b border-blue-100 last:border-b-0">
+                    <tr key={profile._id || profile.personal.email} className="hover:bg-blue-50/80 transition-all duration-200 border-b border-blue-100 last:border-b-0">
                       <td className="text-center font-bold text-blue-600 py-4">
                         {startIndex + index + 1}
                       </td>
@@ -262,23 +264,23 @@ const ProfileList = ({
                           <div className="avatar placeholder">
                            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
                               <span className="text-white font-bold text-sm">
-                                {profile?.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
+                                {profile?.personal?.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
                               </span>
                             </div>
                           </div>
                           <div>
                             <div className="font-bold text-gray-800 text-lg">
-                              {profile?.name || 'Unnamed Profile'}
+                              {profile?.personal.name || 'Unnamed Profile'}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="py-4">
                         <div className="space-y-2">
-                          {profile?.email && (
+                          {profile?.personal?.email && (
                             <div className="flex items-center gap-2 text-gray-700 font-medium">
                               <Mail className="w-4 h-4 text-blue-500" />
-                              {profile?.email}
+                              {profile.personal.email}
                             </div>
                           )}
                         </div>

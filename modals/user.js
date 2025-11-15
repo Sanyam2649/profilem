@@ -20,8 +20,11 @@ const UserSchema = new Schema(
       minlength: 6,
     },
     avatar: {
-      type: String,
-      default: '',
+        url: String,
+        originalName: String,
+        mimetype: String,
+        publicId: String,
+        resourceType: String
     },
   },
   {

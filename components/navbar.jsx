@@ -64,7 +64,7 @@ const UserAvatar = ({ user, size = 'md' }) => {
 
   return user.avatar ? (
     <Image
-      src={user.avatar}
+      src={user?.avatar?.url}
       alt="avatar"
       width={40}
       height={40}
@@ -154,24 +154,25 @@ const Navbar = () => {
   }, [user]);
 
   const handleProfileUpdate = useCallback(async () => {
-    if (!user) return;
-    
+    if (!user) return;    
     setIsUpdatingProfile(true);
     setProfileError('');
     setProfileSuccess('');
+
+    const fd = new FormData();
+    const userId = user?.id;
+    fd.append("userId", userId);
+    fd.append("name", profileData.name);
+    fd.append("email", profileData.email);
+
+    if (profileData.avatarFile) {
+      fd.append("avatar", profileData.avatarFile);
+    }
     
     try {
       const response = await fetch('/api/user/update', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          userId: user._id, 
-          name: profileData.name,
-          email: profileData.email,
-          avatar: profileData.avatar 
-        }),
+         body: fd,
       });
       
       if (!response.ok) {
@@ -303,12 +304,6 @@ const Navbar = () => {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-gray-900 truncate text-sm">{user.name}</h3>
                           <p className="text-xs text-gray-700 truncate">{user.email}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star className="w-3 h-3 text-amber-500" />
-                            <span className="text-xs text-gray-600">
-                              Member since {new Date(user.createdAt).getFullYear()}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </li>
@@ -449,32 +444,57 @@ const Navbar = () => {
                 {/* Avatar Section */}
                 <div className="bg-gray-50 border border-gray-300 p-4 rounded-xl">
                   <div className="text-center">
-                    {profileData.avatar ? (
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full border-4 border-white shadow-lg overflow-hidden mb-3">
-                        <Image
-                          src={profileData.avatar}
-                          alt="Profile Avatar"
-                          width={96}
-                          height={96}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className={`w-20 h-20 sm:w-24 sm:h-24 ${getAvatarColor(
-                          profileData.name || user.name
-                        )} rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3`}
-                      >
-                        {getNameInitials(profileData.name || user.name)}
-                      </div>
-                    )}
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="avatarInput"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        handleProfileChange("avatarFile", file);
+
+                        const previewUrl = URL.createObjectURL(file);
+                        handleProfileChange("avatar", previewUrl);
+                      }}
+
+                    />
+
+                    {/* Clickable Avatar */}
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => document.getElementById("avatarInput").click()}
+                    >
+                      {profileData.avatar ? (
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full shadow-md overflow-hidden mb-3 border-4 border-white">
+                          <Image
+                            src={profileData.avatar}
+                            alt="Profile Avatar"
+                            width={120}
+                            height={120}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center 
+          text-white text-2xl font-bold mx-auto mb-3 shadow-md 
+          ${getAvatarColor(profileData.name || user.name)}`}
+                        >
+                          {getNameInitials(profileData.name || user.name)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hint */}
+                    <div className="text-gray-600 text-sm flex justify-center items-center gap-2">
                       <Camera className="w-4 h-4" />
-                      <span>Paste image URL to update</span>
+                      <span>Click avatar to upload</span>
                     </div>
                   </div>
                 </div>
-
+                
                 {/* Form Section */}
                 <div className="bg-gray-50 border border-gray-300 p-4 rounded-xl">
                   <div className="space-y-4">

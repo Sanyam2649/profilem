@@ -61,9 +61,6 @@ const Dashboard = () => {
       }
       
       const data = await response.json();
-      console.log('Profiles API response:', data);
-      
-      // Handle different response structures and ensure all required arrays are present
       let userProfiles= [];
       
       if (data.profile) {
@@ -74,34 +71,21 @@ const Dashboard = () => {
         userProfiles = data;
       }
       
-      const completeProfiles = userProfiles.map((profile) => ({
-        _id: profile._id || `temp-${Date.now()}-${Math.random()}`,
-        name: profile.name || '',
-        email: profile.email || '',
-        location: profile.location || '',
-        phone: profile.phone || '',
-        website: profile.website || '',
-        bio: profile.bio || '',
-        github: profile.github || '',
-        linkedin: profile.linkedin || '',
-        twitter: profile.twitter || '',
-        portfolio: profile.portfolio || '',
-        education: profile.education || [],
-        experience: profile.experience || [],
-        projects: profile.projects || [],
-        skills: profile.skills || [],
-        interests: profile.interests || [],
-        certifications: profile.certifications || [],
-        updatedAt: profile.updatedAt || new Date().toISOString(),
-        createdAt: profile.createdAt || new Date().toISOString()
-      }));
-      
-      console.log('Processed profiles:', completeProfiles);
-      
+  const completeProfiles = userProfiles.map((profile) => ({
+  _id: profile._id,
+  personal: profile.personal || {},
+  education: profile.education || [],
+  experience: profile.experience || [],
+  projects: profile.projects || [],
+  skills: profile.skills || [],
+  certification: profile.certification || [],
+  customSections: profile.customSections || [], // Keep as customSections
+  sectionOrder: profile.sectionOrder || [],
+  updatedAt: profile.updatedAt,
+  createdAt: profile.createdAt,
+}));     
       setProfiles(completeProfiles);
       setFilteredProfiles(completeProfiles);
-      
-      // Calculate stats
       const totalProfiles = completeProfiles.length;
       const recentProfiles = completeProfiles.filter((p) => 
         new Date(p.updatedAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)

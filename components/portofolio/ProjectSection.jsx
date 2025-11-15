@@ -1,264 +1,174 @@
-import {useState } from 'react';
-import { ExternalLink, Calendar, Code, Zap, Star, Clock, Github, ArrowUpRight, Play } from 'lucide-react';
+"use client";
+import { Code, Calendar, Clock, Github, Play } from "lucide-react";
 
-const ProjectsSection = ({ projects }) => {
-  const [hoveredProject, setHoveredProject] = useState(null);
-  const [filter, setFilter] = useState('all');
+export default function ProjectsSection({ projects = [] }) {
+  // Monster Trio Ordering (same design, different priority)
+  const luffy = projects.slice(0, 3);
+  const zoro = projects.slice(3, 6);
+  const sanji = projects.slice(6);
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-  };
+  const ordered = [...luffy, ...zoro, ...sanji];
 
-  const getProjectDuration = (startDate, endDate) => {
-    if (!startDate) return null;
-    
-    const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : new Date();
-    const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-    
-    if (months < 12) return `${months} month${months !== 1 ? 's' : ''}`;
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    
-    if (remainingMonths === 0) return `${years} year${years !== 1 ? 's' : ''}`;
-    return `${years} year${years !== 1 ? 's' : ''} ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
-  };
+  return (
+    <section className="relative py-16 px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white border rounded-xl shadow-sm">
+            <Code className="w-4 h-4 text-emerald-600" />
+            <span className="font-semibold text-gray-700">Project Portfolio</span>
+          </div>
 
-  const getTechColor = (tech) => {
-    const techColors = {
-      'React': 'from-blue-500 to-cyan-500',
-      'TypeScript': 'from-blue-600 to-blue-800',
-      'JavaScript': 'from-yellow-400 to-yellow-600',
-      'Node.js': 'from-green-500 to-green-700',
-      'Python': 'from-blue-400 to-indigo-600',
-      'Next.js': 'from-gray-700 to-gray-900',
-      'Vue': 'from-green-400 to-green-600',
-      'Angular': 'from-red-500 to-red-700',
-      'Express': 'from-gray-500 to-gray-700',
-      'MongoDB': 'from-green-600 to-green-800',
-      'PostgreSQL': 'from-blue-700 to-blue-900',
-      'Tailwind': 'from-teal-400 to-cyan-500',
-      'AWS': 'from-orange-400 to-orange-600',
-      'Docker': 'from-blue-400 to-blue-600',
-      'Kubernetes': 'from-blue-500 to-blue-700',
-    };
-    
-    return techColors[tech] || 'from-purple-500 to-pink-500';
-  };
-  
-
-  const getProjectStatus = (startDate, endDate) => {
-    if (!endDate) return 'active';
-    return 'completed';
-  };
-
-  const filteredProjects = filter === 'all' 
-    ? projects 
-    : projects.filter(project => getProjectStatus(project.startDate, project.endDate) === filter);
-
- return (
-  <section className="relative py-16 px-4 sm:px-6">
-    {/* Background */}
-    <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-cyan-50/50" />
-
-    <div className="relative max-w-6xl mx-auto z-10">
-      {/* Header */}
-      <div className="text-center mb-10 sm:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 rounded-xl shadow border mb-4">
-          <Code className="w-4 h-4 text-emerald-600" />
-          <span className="text-xs sm:text-sm font-semibold text-gray-700">
-            Portfolio Showcase
-          </span>
+          <h2 className="text-4xl sm:text-5xl font-black mt-4 bg-gradient-to-r from-gray-900 to-emerald-800 text-transparent bg-clip-text">
+            Featured Projects
+          </h2>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-gray-900 to-emerald-800 bg-clip-text text-transparent mb-4">
-          Featured Projects
-        </h2>
-
-        <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          Innovative builds crafted with modern technologies and precision.
-        </p>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex justify-center mb-10">
-        <div className="bg-white/80 rounded-xl p-1 sm:p-2 shadow border flex gap-1 sm:gap-2">
-          {[
-            { key: "all", label: "All", count: projects.length },
-            { key: "active", label: "Active", count: projects.filter(p => !p.endDate).length },
-            { key: "completed", label: "Completed", count: projects.filter(p => p.endDate).length },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              className={`px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-all ${
-                filter === tab.key
-                  ? "bg-emerald-500 text-white shadow"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {tab.label} ({tab.count})
-            </button>
+        {/* --- HORIZONTAL SCROLL CARDS --- */}
+        <div
+          className="
+            flex gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory
+            pb-4 pt-2
+          "
+        >
+          {ordered.map((p, i) => (
+            <div key={i} className="snap-center flex-shrink-0 w-[90%] sm:w-[60%] lg:w-[33%]">
+              <ProjectCard project={p} />
+            </div>
           ))}
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-        {filteredProjects.map((project, index) => {
-          const status = getProjectStatus(project.startDate, project.endDate);
+function ProjectCard({ project }) {
+  const formatDate = (d) =>
+    d
+      ? new Date(d).toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        })
+      : "—";
 
-          return (
-            <div
-              key={index}
-              className="bg-white rounded-2xl p-5 shadow border flex flex-col hover:shadow-lg transition-all"
-            >
-              {/* Title */}
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow text-white">
-                    <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg sm:text-xl text-gray-900">
-                      {project.name}
-                    </h3>
-                    {project.startDate && (
-                      <p className="text-gray-500 text-xs sm:text-sm flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {project.endDate
-                          ? `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`
-                          : `Started ${formatDate(project.startDate)}`}
-                      </p>
-                    )}
-                  </div>
-                </div>
+  const getDuration = (startDate, endDate) => {
+    if (!startDate) return null;
 
-                {/* Status Badge */}
-                <span
-                  className={`px-2 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 border ${
-                    status === "active"
-                      ? "bg-orange-50 text-orange-700 border-orange-200"
-                      : "bg-green-50 text-green-700 border-green-200"
-                  }`}
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      status === "active" ? "bg-orange-500 animate-pulse" : "bg-green-500"
-                    }`}
-                  ></span>
-                  {status === "active" ? "Active" : "Completed"}
-                </span>
-              </div>
+    const s = new Date(startDate);
+    const e = endDate ? new Date(endDate) : new Date();
 
-              {/* Duration */}
-              {project.startDate && (
-                <div className="mb-4">
-                  <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
-                    <Clock className="w-4 h-4" />
-                    {getProjectDuration(project.startDate, project.endDate)}
-                  </span>
-                </div>
-              )}
+    const months =
+      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
 
-              {/* Description */}
-              <p className="text-gray-700 text-sm sm:text-base mb-4 line-clamp-3">
-                {project.description}
-              </p>
+    if (months < 12) return `${months} mo`;
+    const yrs = Math.floor(months / 12);
+    const rem = months % 12;
 
-              {/* Tech Stack */}
-              {project.technologies?.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {project.technologies.slice(0, 4).map((tech, i) => (
-                    <span
-                      key={i}
-                      className={`px-3 py-1 text-xs font-semibold rounded-lg text-white bg-gradient-to-r ${getTechColor(
-                        tech
-                      )}`}
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.technologies.length > 4 && (
-                    <span className="px-3 py-1 text-xs rounded-lg bg-gray-100 text-gray-600">
-                      +{project.technologies.length - 4}
-                    </span>
-                  )}
-                </div>
-              )}
+    if (rem === 0) return `${yrs} yrs`;
+    return `${yrs} yrs ${rem} mo`;
+  };
 
-              {/* Links */}
-              <div className="flex gap-3 mt-auto pt-4 border-t">
-                {project.link && (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600"
-                  >
-                    <Play className="w-4 h-4" />
-                    Live Demo
-                  </a>
-                )}
+  return (
+    <div
+      className="
+        bg-white border border-gray-200 rounded-2xl shadow-sm
+        hover:shadow-xl hover:-translate-y-1 transition-all duration-300
+        p-6 flex flex-col h-full
+      "
+    >
+      {/* Title Row */}
+      <div className="flex justify-between mb-4">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
+          {project.name}
+        </h3>
 
-                {project.github && (
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    className="px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 flex items-center justify-center"
-                  >
-                    <Github className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        <span
+          className={`
+            text-xs px-2 py-1 rounded-full font-semibold
+            ${
+              project.endDate
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-orange-50 text-orange-700 border border-orange-200"
+            }
+          `}
+        >
+          {project.endDate ? "Completed" : "Active"}
+        </span>
       </div>
 
-      {/* Summary */}
-      <div className="mt-16 p-6 sm:p-10 bg-white rounded-3xl shadow border">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10 text-center">
-          <SummaryStat
-            icon={<Code className="w-6 h-6 text-emerald-600" />}
-            value={projects.length}
-            label="Total Projects"
-          />
-          <SummaryStat
-            icon={<Zap className="w-6 h-6 text-orange-500" />}
-            value={projects.filter(p => !p.endDate).length}
-            label="Active"
-          />
-          <SummaryStat
-            icon={<Star className="w-6 h-6 text-amber-500" />}
-            value={Array.from(new Set(projects.flatMap(p => p.technologies))).length}
-            label="Technologies"
-          />
-          <SummaryStat
-            icon={<ExternalLink className="w-6 h-6 text-blue-600" />}
-            value={projects.filter(p => p.link).length}
-            label="Live Demos"
-          />
+      {/* Dates */}
+      <div className="flex items-center gap-2 text-gray-600 text-sm mb-3">
+        <Calendar className="w-4 h-4" />
+        {project.endDate
+          ? `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`
+          : `Started ${formatDate(project.startDate)}`}
+      </div>
+
+      {/* Duration */}
+      {project.startDate && (
+        <div className="mb-4">
+          <span className="text-xs px-3 py-1 rounded-lg bg-gray-100 text-gray-700 font-semibold w-fit flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            {getDuration(project.startDate, project.endDate)}
+          </span>
         </div>
+      )}
+
+      {/* Description */}
+      <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 mb-4">
+        {project.description}
+      </p>
+
+      {/* Tech Stack */}
+      {project.technologies?.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-5">
+          {project.technologies.slice(0, 5).map((tech, i) => (
+            <span
+              key={i}
+              className="px-3 py-1 text-xs rounded-lg bg-gray-100 border text-gray-700 font-medium"
+            >
+              {tech}
+            </span>
+          ))}
+
+          {project.technologies.length > 5 && (
+            <span className="px-3 py-1 text-xs rounded-lg bg-gray-50 border text-gray-500">
+              +{project.technologies.length - 5}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3 mt-auto pt-4 border-t">
+        {project.link && (
+          <a
+            href={project.link}
+            target="_blank"
+            className="
+              flex-1 flex items-center justify-center gap-2 px-4 py-2
+              bg-emerald-500 text-white rounded-xl text-sm font-semibold
+              hover:bg-emerald-600 transition-all
+            "
+          >
+            <Play className="w-4 h-4" />
+            Live Demo
+          </a>
+        )}
+
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            className="
+              px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-black
+              flex items-center justify-center transition-all
+            "
+          >
+            <Github className="w-4 h-4" />
+          </a>
+        )}
       </div>
     </div>
-  </section>
-);
-
-
-};
-
-export default ProjectsSection;
-
-  const SummaryStat = ({ icon, value, label }) => (
-  <div className="space-y-3">
-    <div className="flex items-center justify-center gap-3">
-      {icon}
-      <div className="text-3xl sm:text-4xl font-black text-gray-900">
-        {value}
-      </div>
-    </div>
-    <div className="text-sm sm:text-lg text-gray-600 font-semibold">
-      {label}
-    </div>
-  </div>
-);
+  );
+}

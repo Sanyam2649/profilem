@@ -178,26 +178,48 @@ export default function ResumePDF({ profile }) {
             <Text style={styles.sectionTitle}>Technical Projects</Text>
             <View style={styles.rule} />
 
-            {profile.projects.map((proj, i) => (
-              <View key={i} style={styles.block}>
-                <View style={styles.blockHeader}>
-                  <Text style={styles.blockHeaderLeft}>{proj.name}</Text>
-                  <Text style={styles.blockHeaderRight}>
-                    {dateRange(proj.startDate, proj.endDate)}
-                  </Text>
-                </View>
-                  {proj.technologies?.length > 0 && (
-                  <Text style={styles.skillList}>
-                    <Text style={{ fontWeight: 700 }}>Tech: </Text>
-                    {proj.technologies.join(", ")}
-                  </Text>
-                )}
+           {profile.projects.map((proj, i) => (
+  <View key={i} style={styles.block}>
+    
+    {/* Header */}
+    <View style={styles.blockHeader}>
+      <Text style={styles.blockHeaderLeft}>{proj.name}</Text>
+      <Text style={styles.blockHeaderRight}>
+        {dateRange(proj.startDate, proj.endDate)}
+      </Text>
+    </View>
 
-                <Text style={{ fontSize: 10, marginBottom: 2 }}>
-                  {proj.description}
-                </Text>
-              </View>
-            ))}
+    {/* Links Row */}
+    {(proj.link || proj.github) && (
+      <View style={{ flexDirection: "row", marginBottom: 3 }}>
+        {proj.link && (
+          <Text style={{ fontSize: 9, color: "#2563eb", marginRight: 10 }}>
+            <a href={proj.link}>Live</a>
+          </Text>
+        )}
+        {proj.github && (
+          <Text style={{ fontSize: 9, color: "#2563eb" }}>
+            <a href={proj.github}>Github</a>
+          </Text>
+        )}
+      </View>
+    )}
+
+    {/* Tech Stack */}
+    {proj.technologies?.length > 0 && (
+      <Text style={styles.skillList}>
+        <Text style={{ fontWeight: 700 }}>Tech: </Text>
+        {proj.technologies.join(", ")}
+      </Text>
+    )}
+
+    {/* Description */}
+    <Text style={{ fontSize: 10, marginBottom: 2 }}>
+      {proj.description}
+    </Text>
+  </View>
+))}
+
           </View>
         )}
         

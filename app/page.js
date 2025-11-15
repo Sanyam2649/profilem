@@ -6,6 +6,7 @@ import LoginForm from '@/components/login';
 import RegisterModal from '@/components/register';
 import Button from '@/components/button';
 import { useUser } from '@/contexts/UserContext';
+import Image from 'next/image';
 
 const Home = () => {
   const router = useRouter();
@@ -68,11 +69,17 @@ const Home = () => {
               <div className="text-center mb-2 sm:mb-4">
                 <div className="relative inline-block mb-4">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white shadow-lg mx-auto overflow-hidden">
-                    <img
+                    {/* <img
                       src={user?.avatar}
                       alt={user?.name}
                       className="w-full h-full object-cover"
-                    />
+                    /> */}
+                     <Image
+                          src={user?.avatar?.url}
+                          alt="avatar"
+                          width={40}
+                          height={40}
+                          className="w-full h-full object-cover"/>
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white"></div>
                 </div>

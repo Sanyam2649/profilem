@@ -3,22 +3,23 @@ import { updateUser } from '@/lib/user.js';
 
 export async function PATCH(req) {
   try {
-    const body = await req.json();
-    const { userId, ...data } = body;
+    const formData = await req.formData();
+    const userId = formData.get("userId");
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const avatarFile = formData.get("avatar");
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    const updatePayload = { name, email };
+
+    if (avatarFile && avatarFile.size > 0) {
+      updatePayload.avatarBuffer = Buffer.from(await avatarFile.arrayBuffer());
+      updatePayload.avatarFileName = avatarFile.name;
     }
 
-    const updatedUser = await updateUser(userId, data);
+    const updatedUser = await updateUser(userId, updatePayload);
 
-    if (!updatedUser) {
-      return NextResponse.json({ error: 'User not found or not updated' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'User updated successfully', user: updatedUser });
+    return NextResponse.json({ user: updatedUser }, { status: 200 });
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: errMsg }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

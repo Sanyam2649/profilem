@@ -1,290 +1,196 @@
-// ExperienceSection.tsx
-import { useState } from 'react';
-import { Calendar, MapPin, Rocket, Target, Zap, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+"use client";
 
-const ExperienceSection = ({ experiences }) => {
+import React, { useRef, useEffect, useState } from "react";
+import {
+  Calendar,
+  MapPin,
+  Rocket,
+  Target,
+  Zap,
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+
+const ICONS = [Rocket, Target, Zap, TrendingUp];
+
+export default function ExperienceSection({ experiences = [] }) {
   const [expandedCard, setExpandedCard] = useState(null);
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  const IconFor = (i) => ICONS[i % ICONS.length];
+
+  const formatDate = (d) => {
+    if (!d) return "Present";
+    const dt = new Date(d);
+    return dt.toLocaleDateString("en-US", { month: "short", year: "numeric" });
   };
 
-  const calculateDuration = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : new Date();
-    
-    const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+  const calcDuration = (start, end) => {
+    const s = new Date(start);
+    const e = end ? new Date(end) : new Date();
+
+    const months =
+      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+
     const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    
-    if (years === 0) return `${remainingMonths} mos`;
-    if (remainingMonths === 0) return `${years} yr${years > 1 ? 's' : ''}`;
-    return `${years} yr${years > 1 ? 's' : ''} ${remainingMonths} mos`;
+    const rem = months % 12;
+
+    if (years === 0) return `${rem} mos`;
+    if (rem === 0) return `${years} yrs`;
+    return `${years} yrs ${rem} mos`;
   };
 
-  const getRoleIcon = (index) => {
-    const icons = [Rocket, Target, Zap, TrendingUp];
-    return icons[index % icons.length];
+  const totalYears = () => {
+    const months = experiences.reduce((sum, exp) => {
+      const s = new Date(exp.startDate);
+      const e = exp.endDate ? new Date(exp.endDate) : new Date();
+
+      return (
+        sum + (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth())
+      );
+    }, 0);
+
+    return Math.floor(months / 12);
   };
 
-  const toggleExpand = (index) => {
-    setExpandedCard(expandedCard === index ? null : index);
-  };
+  const uniqueTechCount = () =>
+    new Set(experiences.flatMap((e) => e.technologies || [])).size;
 
-return (
-  <section className="relative py-16 sm:py-20 px-4 sm:px-6">
-    {/* Background */}
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-cyan-50/50"></div>
+  return (
+    <section className="relative py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
+          <div>
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 text-sm text-gray-700 border border-gray-200 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              Professional Journey
+            </div>
 
-    <div className="container mx-auto max-w-6xl relative z-10">
+            <h2 className="mt-4 text-4xl md:text-5xl font-black text-[#0b1220]">
+              Work Experience
+            </h2>
 
-      {/* HEADER */}
-      <div className="text-center mb-14 sm:mb-16 px-2">
-        <div className="inline-flex items-center gap-3 px-5 py-2.5 sm:px-6 sm:py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-200/50 mb-6">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-xs sm:text-sm font-semibold text-gray-700">
-            Professional Journey
-          </span>
+            <p className="mt-2 text-gray-600 max-w-xl">
+              Calm force. Heavy impact. A timeline of mastery.
+            </p>
+          </div>
         </div>
 
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent leading-tight mb-4">
-          Work Experience
-        </h2>
-
-        <p className="text-base sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Crafting digital excellence through {experiences.length} transformative roles
-        </p>
-      </div>
-
-      {/* TIMELINE WRAPPER */}
-      <div className="relative">
-
-        {/* Vertical Line */}
-        <div className="absolute left-6 sm:left-10 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b 
-                        from-blue-200 via-purple-200 to-cyan-200 rounded-full shadow-md
-                        md:-translate-x-1/2"></div>
-
-        <div className="space-y-12 sm:space-y-14 md:space-y-16">
-
-          {experiences.map((exp, index) => {
-            const IconComponent = getRoleIcon(index);
-            const isEven = index % 2 === 0;
-            const isExpanded = expandedCard === index;
+        {/* ------------------------
+            HORIZONTAL EXPERIENCE CARDS
+         ------------------------ */}
+        <div
+          className="
+            flex gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory
+            pb-4
+          "
+        >
+          {experiences.map((exp, i) => {
+            const Icon = IconFor(i);
+            const expanded = expandedCard === i;
 
             return (
-              <div key={index} className="relative group px-2">
-
-                {/* MOBILE FIRST — always stacked */}
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 
-                                md:gap-12 
-                                md:justify-between 
-                                md:max-w-[48%]
-                                md:absolute
-                                md:top-0
-                                md:left-0
-                                md:right-0
-                                md:mx-auto
-                                md:relative
-                                md:[&.even]:justify-end
-                                ">
-
-                  {/* TIMELINE NODE */}
-                  <div className={`
-                    w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white border-4 border-blue-500 
-                    shadow-2xl z-10 flex items-center justify-center 
-                    transform transition-transform duration-300 
-                    ${isEven ? 'md:order-last md:ml-10' : 'md:mr-10'}
-                  `}>
-                    <IconComponent className="w-6 h-6 text-blue-600" />
-                  </div>
-
-                  {/* EXPERIENCE CARD */}
-                  <div className={`
-                    flex-1 bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 
-                    shadow-xl hover:shadow-2xl border border-gray-200/70 
-                    transition-all duration-300 
-                    ${isEven ? 'md:text-right md:mr-auto' : 'md:text-left md:ml-auto'}
-                  `}>
-
-                    {/* ROLE BADGE */}
-                    <div className={`inline-flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 
-                                    bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl 
-                                    border border-blue-100 shadow-md mb-6 
-                                    ${isEven ? 'md:ml-auto' : ''}`}>
-                      <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-                      <span className="text-base sm:text-lg font-bold text-blue-700">
-                        {exp.position}
-                      </span>
-                    </div>
-
-                    {/* COMPANY + DATE */}
-                    <div className={`
-                      flex flex-col lg:flex-row gap-3 sm:gap-6 mb-6 
-                      ${isEven ? 'md:flex-row-reverse' : ''}
-                    `}>
-                      <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
-                        {exp.company}
-                      </h3>
-
-                      <div className={`flex items-center gap-3 text-gray-600 text-sm sm:text-base
-                                      ${isEven ? 'md:flex-row-reverse' : ''}`}>
-                        <Calendar className="w-5 h-5" />
-                        <span>
-                          {formatDate(exp.startDate)} –{' '}
-                          {exp.endDate ? formatDate(exp.endDate) : 'Present'}
-                        </span>
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-semibold text-xs sm:text-sm">
-                          {calculateDuration(exp.startDate, exp.endDate)}
-                        </span>
+              <div
+                key={i}
+                className="
+                  snap-center flex-shrink-0
+                  w-[90%] sm:w-[70%] lg:w-[50%]
+                "
+              >
+                <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden relative">
+                  <div className="grid grid-cols-1 md:grid-cols-[auto_1fr]">
+                    {/* Left Icon */}
+                    <div className="px-6 py-6 flex md:flex-col items-center gap-4">
+                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                        <Icon className="w-6 h-6" />
                       </div>
                     </div>
 
-                    {/* LOCATION */}
-                    {exp.location && (
-                      <div className={`flex items-center gap-3 text-gray-500 mb-6 
-                                      text-sm sm:text-lg
-                                      ${isEven ? 'md:justify-end' : ''}`}>
-                        <MapPin className="w-5 h-5" />
-                        {exp.location}
-                      </div>
-                    )}
+                    {/* Right Content */}
+                    <div className="p-6 md:p-8">
+                      {/* Header */}
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <h3 className="text-xl md:text-2xl font-extrabold text-[#0b1220]">
+                            {exp.position}
+                          </h3>
 
-                    {/* RESPONSIBILITIES */}
-                    {exp.responsibilities?.length > 0 && (
-                      <div className="mb-6">
-                        <h4 className="text-sm sm:text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide flex items-center gap-3">
-                          <Target className="w-5 h-5 text-blue-600" />
-                          Key Achievements
-                        </h4>
+                          <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
+                            <span className="font-semibold text-gray-800">
+                              {exp.company}
+                            </span>
 
-                        <div className="space-y-3">
-                          {exp.responsibilities
-                            .slice(0, isExpanded ? exp.responsibilities.length : 3)
-                            .map((resp, idx) => (
-                              <div key={idx} className="flex items-start gap-4">
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-2"></div>
-                                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-                                  {resp}
-                                </p>
-                              </div>
-                            ))}
+                            <span className="px-2 py-1 bg-gray-100 rounded-full text-xs">
+                              {formatDate(exp.startDate)} – {formatDate(exp.endDate)}
+                            </span>
+
+                            <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold">
+                              {calcDuration(exp.startDate, exp.endDate)}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Toggle */}
-                        {exp.responsibilities.length > 3 && (
-                          <button
-                            onClick={() => toggleExpand(index)}
-                            className="flex items-center gap-2 mt-4 text-blue-600 hover:text-blue-700 text-sm sm:text-base font-semibold"
-                          >
-                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            {isExpanded
-                              ? 'Show Less'
-                              : `Show More (${exp.responsibilities.length - 3} more)`}
-                          </button>
-                        )}
+                        {/* Expand Button */}
+                        <div className="flex items-center gap-3">
+                          {exp.responsibilities?.length > 3 && (
+                            <button
+                              onClick={() =>
+                                setExpandedCard(expanded ? null : i)
+                              }
+                              className="flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-full bg-gray-50 hover:bg-gray-100 border"
+                            >
+                              {expanded ? <ChevronUp /> : <ChevronDown />}
+                              {expanded ? "Collapse" : "Details"}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    )}
 
-                    {/* TECH STACK */}
-                    {exp.technologies.length > 0 && (
-                      <div className="pt-6 border-t border-gray-200/50">
-                        <h4 className="text-sm sm:text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide">
-                          Tech Stack
-                        </h4>
+                      {/* Responsibilities */}
+                      {exp.responsibilities && exp.responsibilities.length > 0 && (
+                        <div
+                          className={`mt-5 text-gray-700 transition-all ${
+                            expanded ? "max-h-[2000px]" : "max-h-28 overflow-hidden"
+                          }`}
+                        >
+                          <ul className="space-y-3">
+                            {(expanded
+                              ? exp.responsibilities
+                              : exp.responsibilities.slice(0, 3)
+                            ).map((r, idx) => (
+                              <li key={idx} className="flex gap-3 items-start">
+                                <span className="w-2.5 h-2.5 mt-2 rounded-full bg-blue-500" />
+                                <p className="text-sm leading-relaxed">{r}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-                        <div className="flex flex-wrap gap-2 sm:gap-3">
+                      {/* Tech Stack */}
+                      {exp.technologies && exp.technologies.length > 0 && (
+                        <div className="mt-6 pt-4 border-t border-gray-200 flex flex-wrap gap-2">
                           {exp.technologies.map((tech, idx) => (
                             <span
                               key={idx}
-                              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-gray-50 to-blue-50 
-                                         text-gray-700 rounded-xl text-xs sm:text-base 
-                                         border border-gray-200 hover:border-blue-300 
-                                         hover:shadow-lg transition-all duration-200"
+                              className="px-3 py-1 rounded-full bg-gray-50 border text-xs text-gray-700"
                             >
                               {tech}
                             </span>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+
       </div>
+    </section>
+  );
+}
 
-      {/* CAREER FOOTER */}
-      <div className="mt-20 bg-white/80 backdrop-blur-sm rounded-3xl p-8 sm:p-10 border border-gray-200 shadow-2xl">
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center">
-
-          <div>
-            <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {experiences.length}
-            </div>
-            <div className="text-sm sm:text-lg text-gray-600 font-semibold">Roles Mastered</div>
-          </div>
-
-          <div>
-            <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {(() => {
-                const months = experiences.reduce((total, exp) => {
-                  const start = new Date(exp.startDate);
-                  const end = exp.endDate ? new Date(exp.endDate) : new Date();
-                  return total + ((end - start) / (1000 * 60 * 60 * 24 * 30));
-                }, 0);
-                return Math.floor(months / 12);
-              })()}+
-            </div>
-            <div className="text-sm sm:text-lg text-gray-600 font-semibold">Years Experience</div>
-          </div>
-
-          <div>
-            <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {Array.from(new Set(experiences.flatMap(e => e.technologies))).length}+
-            </div>
-            <div className="text-sm sm:text-lg text-gray-600 font-semibold">Technologies</div>
-          </div>
-
-          <div>
-            <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {experiences.filter(exp => !exp.endDate).length}
-            </div>
-            <div className="text-sm sm:text-lg text-gray-600 font-semibold">Current Roles</div>
-          </div>
-        </div>
-
-        {/* PROGRESS BAR */}
-        <div className="mt-10">
-          <div className="flex items-center justify-between text-xs sm:text-lg text-gray-600 mb-3 font-semibold">
-            <span>Career Journey Progress</span>
-            <span>
-              {(() => {
-                const months = experiences.reduce((total, exp) => {
-                  const start = new Date(exp.startDate);
-                  const end = exp.endDate ? new Date(exp.endDate) : new Date();
-                  return total + ((end - start) / (1000 * 60 * 60 * 24 * 30));
-                }, 0);
-                const years = Math.floor(months / 12);
-                return `${years} years of growth`;
-              })()}
-            </span>
-          </div>
-
-          <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 h-3 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${Math.min(100, (experiences.length / 10) * 100)}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-};
-
-export default ExperienceSection;

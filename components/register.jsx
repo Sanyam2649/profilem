@@ -23,46 +23,45 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
+  if (formData.password !== formData.confirmPassword) {
+    setError('Passwords do not match');
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append("name", formData.name);
+    fd.append("email", formData.email);
+    fd.append("password", formData.password);
+
+    if (formData.avatarFile) {
+      fd.append("avatar", formData.avatarFile);
     }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      setIsLoading(false);
-      return;
-    }
 
-    try {
-      const response = await fetch('/api/user/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          avatar: formData.avatar || undefined,
-        }),
-      });
+    const res = await fetch("/api/user/register", {
+      method: "POST",
+      body: fd,
+    });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Registration failed');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
 
-      login(data.user);
-      onSuccess?.();
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    login(data.user);
+    onSuccess?.();
+    router.push("/dashboard");
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -80,7 +79,7 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
           type="text"
           name="name"
           placeholder="Full Name"
-          className="input input-bordered w-full bg-white border-slate-300 focus:border-blue-500"
+          className="input input-bordered w-full text-black bg-white border-slate-300 focus:border-blue-500"
           value={formData.name}
           onChange={handleChange}
           required
@@ -91,7 +90,7 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
           type="email"
           name="email"
           placeholder="Email"
-          className="input input-bordered w-full bg-white border-slate-300 focus:border-blue-500"
+          className="input input-bordered w-full text-black bg-white border-slate-300 focus:border-blue-500"
           value={formData.email}
           onChange={handleChange}
           required
@@ -99,20 +98,18 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
 
         <label className="label text-slate-700">Avatar URL (optional)</label>
         <input
-          type="url"
-          name="avatar"
-          placeholder="https://example.com/avatar.jpg"
-          className="input input-bordered w-full bg-white border-slate-300 focus:border-blue-500"
-          value={formData.avatar}
-          onChange={handleChange}
+          type="file"
+          accept="image/*"
+          onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files[0] })}
         />
+
 
         <label className="label text-slate-700">Password</label>
         <input
           type="password"
           name="password"
           placeholder="Password"
-          className="input input-bordered w-full bg-white border-slate-300 focus:border-blue-500"
+          className="input input-bordered w-full text-black bg-white border-slate-300 focus:border-blue-500"
           value={formData.password}
           onChange={handleChange}
           required
@@ -123,7 +120,7 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
           type="password"
           name="confirmPassword"
           placeholder="Confirm Password"
-          className="input input-bordered w-full bg-white border-slate-300 focus:border-blue-500"
+          className="input input-bordered w-full text-black bg-white border-slate-300 focus:border-blue-500"
           value={formData.confirmPassword}
           onChange={handleChange}
           required
