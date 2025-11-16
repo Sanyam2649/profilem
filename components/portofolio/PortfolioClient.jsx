@@ -170,7 +170,7 @@ export default function PortfolioClient({ profileId }) {
 
       {/* Download Button */}
       <button
-        onClick={() => window.print();}
+        onClick={() => window.print()}
         className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg z-50"
       >
         <Download className="w-5 h-5" />
