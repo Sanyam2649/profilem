@@ -175,8 +175,25 @@ const ProfileFormModal = ({
       // ---- 1) Frontend simple-field conversion (existing behavior) ----
       const customFields = customSectionsToFields(editingData.customSections || []);
 
-      // ---- 2) FIX sectionOrder automatically ----
-      let fixedOrder = editingData.sectionOrder || [];
+      let fixedOrder;
+
+if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
+  // edit mode
+  fixedOrder = editingData.sectionOrder.map(k =>
+    k === 'customFields' ? 'customSections' : k
+  );
+} else {
+  // create mode
+  fixedOrder = [
+    'personal',
+    'education',
+    'experience',
+    'projects',
+    'skills',
+    'certification',
+    'customSections',
+  ];
+}
 
       // Convert old 'customFields' → 'customSections'
       fixedOrder = fixedOrder.map((key) =>
