@@ -366,7 +366,7 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white">
       <div className="bg-base-100 p-6 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto relative">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-base-300">

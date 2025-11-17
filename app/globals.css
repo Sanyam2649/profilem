@@ -1,2 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Fredoka:wght@300..700&family=Pacifico&family=Roboto:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @plugin "daisyui";
+
+@theme {
+  --font-sans: "EB Garamond", sans-serif;
+}
+
+/* Apply the font to the whole website */
+body {
+  font-family: var(--font-sans);
+  color: black;
+}
