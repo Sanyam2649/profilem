@@ -33,6 +33,7 @@ const initialEducation = {
   endDate: '',
   grade: '',
   description: '',
+  isCurrent: false,
 };
 
 const initialExperience = {
@@ -43,6 +44,7 @@ const initialExperience = {
   endDate: '',
   responsibilities: [],
   technologies: [],
+  isCurrent: false,
 };
 
 const initialCertification = {
@@ -60,6 +62,7 @@ const initialProject = {
   technologies: [],
   startDate: '',
   endDate: '',
+  isCurrent: false,
 };
 
 const initialSkill = {
@@ -171,6 +174,7 @@ const ProfileFormModal = ({
 
     const timeout = setTimeout(() => {
       const editingData = editingProfile || {};
+      console.log(editingData);
 
       // ---- 1) Frontend simple-field conversion (existing behavior) ----
       const customFields = customSectionsToFields(editingData.customSections || []);
@@ -208,12 +212,37 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
       // Remove duplicates
       fixedOrder = [...new Set(fixedOrder)];
 
-      // ---- 3) Push fixed state ----
+      // // ---- 3) Push fixed state ----
+      // setFormData({
+      //   ...initialFormState,
+      //   ...editingData,
+      //   customSections: customFields,
+      // });
+      
       setFormData({
-        ...initialFormState,
-        ...editingData,
-        customSections: customFields,
-      });
+  ...initialFormState,
+  ...editingData,
+  education: (editingData.education || []).map(e => ({
+    ...e,
+    startDate: toInputDate(e.startDate),
+    endDate: toInputDate(e.endDate),
+    isCurrent: !e.endDate, // true if endDate missing
+  })),
+  experience: (editingData.experience || []).map(e => ({
+    ...e,
+    startDate: toInputDate(e.startDate),
+    endDate: toInputDate(e.endDate),
+    isCurrent: !e.endDate,
+  })),
+  projects: (editingData.projects || []).map(p => ({
+    ...p,
+    startDate: toInputDate(p.startDate),
+    endDate: toInputDate(p.endDate),
+    isCurrent: !p.endDate,
+  })),
+  customSections: customFields,
+});
+
 
       setSectionOrder(fixedOrder);
 
@@ -248,10 +277,18 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
     }
   };
 
-  // Update all your existing functions to work with customSections instead of customFields
-  const updateField = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
+  // // Update all your existing functions to work with customSections instead of customFields
+  // const updateField = (key, value) => {
+  //   setFormData((prev) => ({ ...prev, [key]: value }));
+  // };
+  
+  const toInputDate = (date) => {
+  if (!date) return "";
+  const d = new Date(date);
+  if (isNaN(d)) return "";
+  return d.toISOString().split("T")[0];
+};
+
 
   const addItem = (key, item) => {
     setFormData((prev) => {
@@ -602,10 +639,24 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                                 </label>
                                 <input
                                   type="date"
+                                   disabled={edu.isCurrent}
                                   value={edu.endDate || ''}
                                   onChange={(e) => updateNestedItem('education', idx, 'endDate', e.target.value)}
                                   className="input input-bordered w-full"
                                 />
+                                 <div className="flex items-center gap-2 mb-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={edu.isCurrent}
+                                    onChange={(e) => {
+                                      updateNestedItem('education', idx, "isCurrent", e.target.checked);
+                                      if (e.target.checked) {
+                                        updateNestedItem('education', idx, "endDate", "");
+                                      }
+                                    }}
+                                  />
+                                  <span className="text-sm">Currently Working / Studying</span>
+                                </div>
                               </div>
                               <div className="space-y-2 md:col-span-2">
                                 <label className="label">
@@ -732,10 +783,24 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                                 </label>
                                 <input
                                   type="date"
+                                  disabled={exp.isCurrent}
                                   value={exp.endDate || ''}
                                   onChange={(e) => updateNestedItem('experience', idx, 'endDate', e.target.value)}
                                   className="input input-bordered w-full"
                                 />
+                                 <div className="flex items-center gap-2 mb-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={exp.isCurrent}
+                                    onChange={(e) => {
+                                      updateNestedItem('experience', idx, "isCurrent", e.target.checked);
+                                      if (e.target.checked) {
+                                        updateNestedItem('experience', idx, "endDate", "");
+                                      }
+                                    }}
+                                  />
+                                  <span className="text-sm">Currently Working</span>
+                                </div>
                               </div>
                             </div>
 
@@ -943,10 +1008,24 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                                 </label>
                                 <input
                                   type="date"
+                                  disabled={project.isCurrent}
                                   value={project.endDate || ''}
                                   onChange={(e) => updateNestedItem('projects', idx, 'endDate', e.target.value)}
                                   className="input input-bordered w-full"
                                 />
+                                 <div className="flex items-center gap-2 mb-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={project.isCurrent}
+                                    onChange={(e) => {
+                                      updateNestedItem('projects', idx, "isCurrent", e.target.checked);
+                                      if (e.target.checked) {
+                                        updateNestedItem('projects', idx, "endDate", "");
+                                      }
+                                    }}
+                                  />
+                                  <span className="text-sm">Currently Working / Studying</span>
+                                </div>
                               </div>
                               <div className="space-y-2 md:col-span-2">
                                 <label className="label">

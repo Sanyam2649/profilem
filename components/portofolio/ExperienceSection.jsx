@@ -25,36 +25,25 @@ export default function ExperienceSection({ experiences = [] }) {
     return dt.toLocaleDateString("en-US", { month: "short", year: "numeric" });
   };
 
-  const calcDuration = (start, end) => {
-    const s = new Date(start);
-    const e = end ? new Date(end) : new Date();
+ const calcDuration = (start, end) => {
+  const s = new Date(start);
+  const e = end ? new Date(end) : new Date();  // <-- today if no endDate
 
-    const months =
-      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+  const months =
+    (e.getFullYear() - s.getFullYear()) * 12 +
+    (e.getMonth() - s.getMonth());
 
-    const years = Math.floor(months / 12);
-    const rem = months % 12;
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
 
-    if (years === 0) return `${rem} mos`;
-    if (rem === 0) return `${years} yrs`;
-    return `${years} yrs ${rem} mos`;
-  };
+  if (months <= 0) return "0 mos"; // safety for future dates
 
-  const totalYears = () => {
-    const months = experiences.reduce((sum, exp) => {
-      const s = new Date(exp.startDate);
-      const e = exp.endDate ? new Date(exp.endDate) : new Date();
+  if (years === 0) return `${rem} mos`;
+  if (rem === 0) return `${years} yrs`;
+  return `${years} yrs ${rem} mos`;
+};
 
-      return (
-        sum + (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth())
-      );
-    }, 0);
-
-    return Math.floor(months / 12);
-  };
-
-  const uniqueTechCount = () =>
-    new Set(experiences.flatMap((e) => e.technologies || [])).size;
+console.log(experiences);
 
   return (
     <section className="relative py-16 px-4">
@@ -77,9 +66,6 @@ export default function ExperienceSection({ experiences = [] }) {
           </div>
         </div>
 
-        {/* ------------------------
-            HORIZONTAL EXPERIENCE CARDS
-         ------------------------ */}
         <div
           className="
             flex gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory
