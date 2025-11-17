@@ -90,14 +90,6 @@ const Dashboard = () => {
       const recentProfiles = completeProfiles.filter((p) => 
         new Date(p.updatedAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       ).length;
-      
-      const thisMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      const profilesThisMonth = completeProfiles.filter((p) => {
-        const profileDate = new Date(p.updatedAt);
-        return profileDate.getMonth() === thisMonth && profileDate.getFullYear() === currentYear;
-      }).length;
-
       setStats({
         totalProfiles,
         recentProfiles,
@@ -117,22 +109,27 @@ const Dashboard = () => {
     }
   }, [fetchProfiles, isCheckingAuth, user]);
 
-  const handleSearch = useCallback((query) => {
-    if (!query.trim()) {
-      setFilteredProfiles(profiles);
-      return;
-    }
+  const handleSearch = useCallback(
+    (query) => {
+      if (!query.trim()) {
+        setFilteredProfiles(profiles);
+        return;
+      }
 
-    const filtered = profiles.filter(profile =>
-      profile.name?.toLowerCase().includes(query.toLowerCase()) ||
-      profile.email?.toLowerCase().includes(query.toLowerCase()) ||
-      profile.location?.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    setFilteredProfiles(filtered);
-  }, [profiles]);
+      const q = query.toLowerCase();
 
-  // Modal handlers
+      const filtered = profiles.filter(
+        (p) =>
+          p.personal?.name?.toLowerCase().includes(q) ||
+          p.personal?.email?.toLowerCase().includes(q) ||
+          p.personal?.location?.toLowerCase().includes(q)
+      );
+
+      setFilteredProfiles(filtered);
+    },
+    [profiles]
+  );
+
   const handleCreateProfile = () => {
     console.log('Opening create profile modal');
     setEditingProfile(null);

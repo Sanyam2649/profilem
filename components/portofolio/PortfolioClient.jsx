@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { ChevronDown, X, Sparkles, Download } from 'lucide-react';
+import { ChevronDown, X, Sparkles } from 'lucide-react';
 
 import ExperienceSection from './ExperienceSection';
 import EducationSection from './EducationSection';
@@ -167,18 +167,6 @@ export default function PortfolioClient({ profileId }) {
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
-
-      {/* Download Button */}
-      <button
-        onClick={() =>
-          (window.location.href = `/api/resume/pdf?profileId=${profileId}`)
-        }
-        className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg z-50"
-      >
-        <Download className="w-5 h-5" />
-        <span>Download</span>
-      </button>
-
       {/* MAIN CONTENT */}
       <main className="relative z-10">
         <div className="container mx-auto px-6 w-full pb-24">

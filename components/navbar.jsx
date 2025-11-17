@@ -160,7 +160,7 @@ const Navbar = () => {
     setProfileSuccess('');
 
     const fd = new FormData();
-    const userId = user?.id;
+    const userId = user?._id;
     fd.append("userId", userId);
     fd.append("name", profileData.name);
     fd.append("email", profileData.email);
@@ -466,10 +466,10 @@ const Navbar = () => {
                       className="cursor-pointer"
                       onClick={() => document.getElementById("avatarInput").click()}
                     >
-                      {profileData.avatar ? (
+                      {profileData?.avatar?.url ? (
                         <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full shadow-md overflow-hidden mb-3 border-4 border-white">
                           <Image
-                            src={profileData.avatar}
+                            src={profileData.avatar.url}
                             alt="Profile Avatar"
                             width={120}
                             height={120}

@@ -2,7 +2,6 @@
 import { Code, Calendar, Clock, Github, Play } from "lucide-react";
 
 export default function ProjectsSection({ projects = [] }) {
-  // Monster Trio Ordering (same design, different priority)
   const luffy = projects.slice(0, 3);
   const zoro = projects.slice(3, 6);
   const sanji = projects.slice(6);

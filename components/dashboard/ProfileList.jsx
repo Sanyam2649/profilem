@@ -1,6 +1,5 @@
 import {useState } from 'react';
 import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye, Share2, X, Copy, Check, Mail } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 const PortfolioModal = ({ isOpen, onClose, profile }) => {
   const [copied, setCopied] = useState(false);
@@ -172,21 +171,11 @@ const ProfileList = ({
   onDelete, 
   isLoading = false 
 }) => {
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = 10;
-  
-  console.log(profiles);
-
-  // Filter profiles based on search
-  const filteredProfiles = profiles.filter(profile =>
-    profile.personal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.personal.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.personal.location?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ const filteredProfiles = profiles;
 
   // Pagination
   const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
