@@ -16,8 +16,6 @@ export default function EducationSection({ education = [] }) {
 
   return (
     <section className="relative w-full py-20 overflow-hidden">
-
-      {/* --- OHARA BACKGROUND (subtle parchment) --- */}
       <div className="absolute inset-0 bg-[#faf7f2]" />
       <div className="absolute inset-0 opacity-[0.15] bg-[url('/textures/paper-fiber.png')] mix-blend-multiply" />
 
@@ -28,7 +26,7 @@ export default function EducationSection({ education = [] }) {
           <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white border border-gray-300 shadow-sm">
             <Feather className="w-5 h-5 text-[#5a3d2b]" />
             <span className="text-sm font-semibold text-[#5a3d2b] tracking-wide">
-              Ohara Knowledge Archive
+              Knowledge Archive
             </span>
           </div>
 
