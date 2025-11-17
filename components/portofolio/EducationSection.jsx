@@ -19,7 +19,7 @@ export default function EducationSection({ education = [] }) {
       <div className="absolute inset-0 bg-[#faf7f2]" />
       <div className="absolute inset-0 opacity-[0.15] bg-[url('/textures/paper-fiber.png')] mix-blend-multiply" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
+      <div className="relative z-10 mx-auto px-6">
 
         {/* --- HEADER --- */}
         <div className="text-center mb-16">
@@ -33,14 +33,10 @@ export default function EducationSection({ education = [] }) {
           <h2 className="mt-5 text-5xl md:text-6xl font-serif font-bold tracking-tight text-[#2f1e14]">
             Education
           </h2>
-
-          <p className="text-lg md:text-xl text-[#6e5a46] mt-4 max-w-2xl mx-auto leading-relaxed font-light">
-            A chronicle of scholarly growth, discipline, and intellectual refinement.
-          </p>
         </div>
 
         {/* --- HORIZONTAL SCROLL CARDS --- */}
-        <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none">
+        <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-none justify-center">
           {education.map((edu, i) => {
             const isOpen = expanded === i;
             return (

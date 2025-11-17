@@ -1,26 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Code,
-  Layers,
-  Cpu,
-  Database,
-  Cloud,
-  Puzzle,
-  Terminal,
-  Wrench,
-  Star,
-  Filter,
-} from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Settings, Filter, Code, Cpu, Database, Cloud, Wrench, Layers, Terminal, Puzzle, Star } from "lucide-react";
 
 export default function SkillsSection({ skills }) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("level");
 
-  /* -----------------------------
-      CATEGORY ICONS
-  -----------------------------*/
+  const row1Ref = useRef(null);
+  const row2Ref = useRef(null);
+
+  const [showArrowsRow1, setShowArrowsRow1] = useState(false);
+  const [showArrowsRow2, setShowArrowsRow2] = useState(false);
+
   const Icons = {
     Frontend: Code,
     Backend: Cpu,
@@ -36,9 +28,6 @@ export default function SkillsSection({ skills }) {
 
   const getCategoryIcon = (c) => Icons[c] || Star;
 
-  /* -----------------------------
-      LEVEL SYSTEM
-  -----------------------------*/
   const levelValue = {
     expert: 4,
     advanced: 3,
@@ -67,21 +56,6 @@ export default function SkillsSection({ skills }) {
     beginner: "w-[35%]",
   };
 
-  /* -----------------------------
-       GROUP SKILLS
-  -----------------------------*/
-  const grouped = skills.reduce((acc, s) => {
-    const cat = s.category || "Other";
-    acc[cat] = acc[cat] || [];
-    acc[cat].push(s);
-    return acc;
-  }, {});
-
-  const categories = ["all", ...Object.keys(grouped)];
-
-  /* -----------------------------
-      FILTER + SORT
-  -----------------------------*/
   const visibleSkills =
     selectedCategory === "all"
       ? skills
@@ -93,31 +67,59 @@ export default function SkillsSection({ skills }) {
       : a.name.localeCompare(b.name)
   );
 
-  /* SPLIT INTO TWO ROWS (alternate distribution) */
   const row1 = sortedSkills.filter((_, i) => i % 2 === 0);
   const row2 = sortedSkills.filter((_, i) => i % 2 !== 0);
 
+  /* ---------------------------------------------
+        DETECT OVERFLOW SCROLL (like certificates)
+  ----------------------------------------------*/
+  const checkOverflow = () => {
+    setShowArrowsRow1(row1Ref.current?.scrollWidth > row1Ref.current?.clientWidth);
+    setShowArrowsRow2(row2Ref.current?.scrollWidth > row2Ref.current?.clientWidth);
+  };
+
+useEffect(() => {
+  const frame = requestAnimationFrame(() => {
+    checkOverflow();
+  });
+
+  window.addEventListener("resize", checkOverflow);
+
+  return () => {
+    cancelAnimationFrame(frame);
+    window.removeEventListener("resize", checkOverflow);
+  };
+}, [sortedSkills]);
+
+  /* --------------------------------------------- */
+
+  const scrollLeft = (ref) => ref.current.scrollBy({ left: -300, behavior: "smooth" });
+  const scrollRight = (ref) => ref.current.scrollBy({ left: 300, behavior: "smooth" });
+
   return (
     <section className="relative py-20 px-6">
-      {/* BACKGROUND */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#eef2ff] to-[#fdfcff]" />
+      <div className="relative max-w-7xl mx-auto z-10 text-center">
 
-      <div className="relative max-w-7xl mx-auto z-10">
         {/* HEADER */}
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-black tracking-tight text-gray-900">
-            Technical Skills
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white shadow-sm border rounded-xl">
+            <Settings className="w-5 h-5 text-indigo-600" />
+            <span className="text-sm font-semibold text-gray-700">
+              Skills Archive
+            </span>
+          </div>
+
+          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Skills
           </h2>
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
-            A clean two-row sliding layout — optimized for clarity and space.
-          </p>
         </div>
 
         {/* FILTERS */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-14">
+        <div className="flex justify-between items-center mb-10">
           {/* Category Tabs */}
           <div className="flex flex-wrap gap-3">
-            {categories.map((cat) => (
+            {["all", ...new Set(skills.map((s) => s.category))].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -132,13 +134,13 @@ export default function SkillsSection({ skills }) {
             ))}
           </div>
 
-          {/* Sort Menu */}
+          {/* Sort */}
           <div className="flex items-center gap-3 bg-white border shadow-sm px-4 py-2 rounded-xl">
             <Filter className="w-4 h-4 text-black" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent outline-none text-sm  text-black font-medium"
+              className="bg-transparent outline-none text-sm text-black font-medium"
             >
               <option value="level">Sort by Level</option>
               <option value="name">Sort by Name</option>
@@ -146,87 +148,115 @@ export default function SkillsSection({ skills }) {
           </div>
         </div>
 
-        {/* -----------------------------
-              TWO-ROW SLIDER SYSTEM
-        ------------------------------ */}
-        <div className="space-y-12">
+        {/* ROW 1 */}
+        {showArrowsRow1 && (
+          <div className="flex justify-end mb-2 gap-3">
+            <button className="p-2 bg-gray-200 rounded-full" onClick={() => scrollLeft(row1Ref)}>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
-          {/* ROW 1 */}
-          <div className="flex gap-6 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-none">
-            {row1.map((skill, idx) => {
-              const Icon = getCategoryIcon(skill.category);
-              return (
-                <div
-                  key={idx}
-                  className="snap-center flex-shrink-0 w-[85%] sm:w-[60%] lg:w-[45%]"
-                >
-                  <SkillCard
-                    skill={skill}
-                    Icon={Icon}
-                    levelLabel={levelLabel}
-                    levelColor={levelColor}
-                    levelBar={levelBar}
-                  />
-                </div>
-              );
-            })}
+            <button className="p-2 bg-gray-200 rounded-full" onClick={() => scrollRight(row1Ref)}>
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
+        )}
 
-          {/* ROW 2 */}
-          <div className="flex gap-6 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-none">
-            {row2.map((skill, idx) => {
-              const Icon = getCategoryIcon(skill.category);
-              return (
-                <div
-                  key={idx}
-                  className="snap-center flex-shrink-0 w-[85%] sm:w-[60%] lg:w-[45%]"
-                >
-                  <SkillCard
-                    skill={skill}
-                    Icon={Icon}
-                    levelLabel={levelLabel}
-                    levelColor={levelColor}
-                    levelBar={levelBar}
-                  />
-                </div>
-              );
-            })}
+        <div
+          ref={row1Ref}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-none"
+        >
+          {row1.map((skill, i) => {
+            const Icon = getCategoryIcon(skill.category);
+            return (
+              <div key={i} className="snap-center flex-shrink-0">
+                <SkillCard
+                  skill={skill}
+                  Icon={Icon}
+                  levelLabel={levelLabel}
+                  levelColor={levelColor}
+                  levelBar={levelBar}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ROW 2 */}
+        {showArrowsRow2 && (
+          <div className="flex justify-end mb-2 mt-10 gap-3">
+            <button className="p-2 bg-gray-200 rounded-full" onClick={() => scrollLeft(row2Ref)}>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <button className="p-2 bg-gray-200 rounded-full" onClick={() => scrollRight(row2Ref)}>
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
+        )}
 
+        <div
+          ref={row2Ref}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-none"
+        >
+          {row2.map((skill, i) => {
+            const Icon = getCategoryIcon(skill.category);
+            return (
+              <div key={i} className="snap-center flex-shrink-0">
+                <SkillCard
+                  skill={skill}
+                  Icon={Icon}
+                  levelLabel={levelLabel}
+                  levelColor={levelColor}
+                  levelBar={levelBar}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-/* ------------------------------------
-      REUSABLE SKILL CARD COMPONENT
------------------------------------- */
 function SkillCard({ skill, Icon, levelLabel, levelColor, levelBar }) {
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      {/* TOP ROW */}
+    <div
+      className="
+        bg-white/80 backdrop-blur-sm 
+        border border-gray-200 
+        rounded-2xl p-5 
+        shadow-sm hover:shadow-lg hover:-translate-y-1 
+        transition-all duration-300
+
+        w-[260px]      /* Fixed width like certificates */
+        h-full
+        flex flex-col
+      "
+    >
+      {/* TOP */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gray-900 text-white flex items-center justify-center">
-            <Icon className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center">
+            <Icon className="w-5 h-5" />
           </div>
 
-          <div>
-            <h3 className="text-xl font-bold text-gray-900">{skill.name}</h3>
-            <p className="text-xs text-gray-500">{skill.category}</p>
+          <div className="max-w-[130px]">
+            <h3 className="text-lg font-bold text-gray-900 truncate">
+              {skill.name}
+            </h3>
+            <p className="text-xs text-gray-500 truncate">{skill.category}</p>
           </div>
         </div>
 
         <span
-          className={`text-xs font-bold uppercase ${levelColor[skill.level]}`}
+          className={`text-xs font-bold uppercase truncate ${levelColor[skill.level]}`}
         >
           {levelLabel[skill.level]}
         </span>
       </div>
 
-      {/* BAR */}
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      {/* PROGRESS BAR */}
+      <div className="mt-auto w-full h-2 bg-gray-200 rounded-full overflow-hidden">
         <div className={`h-full bg-gray-900 ${levelBar[skill.level]}`} />
       </div>
     </div>
