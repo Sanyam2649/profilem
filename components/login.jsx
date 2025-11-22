@@ -80,7 +80,7 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
 
         <button
           type="submit"
-          className="btn bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 mt-4 w-full rounded-xl"
+          className="btn bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 mt-4 w-full rounded-xl"
           disabled={isLoading}
         >
           {isLoading ? (

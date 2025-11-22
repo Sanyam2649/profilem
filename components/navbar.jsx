@@ -37,16 +37,16 @@ const getNameInitials = (name) => {
 // Utility function to get color based on name
 const getAvatarColor = (name) => {
   const colors = [
-    'bg-gradient-to-br from-blue-500 to-cyan-500',
-    'bg-gradient-to-br from-purple-500 to-pink-500',
-    'bg-gradient-to-br from-emerald-500 to-teal-500',
-    'bg-gradient-to-br from-orange-500 to-red-500',
-    'bg-gradient-to-br from-violet-500 to-purple-500',
-    'bg-gradient-to-br from-amber-500 to-orange-500',
-    'bg-gradient-to-br from-green-500 to-emerald-500',
-    'bg-gradient-to-br from-rose-500 to-pink-500',
-    'bg-gradient-to-br from-indigo-500 to-blue-500',
-    'bg-gradient-to-br from-sky-500 to-blue-500',
+    'bg-linear-to-br from-blue-500 to-cyan-500',
+    'bg-linear-to-br from-purple-500 to-pink-500',
+    'bg-linear-to-br from-emerald-500 to-teal-500',
+    'bg-linear-to-br from-orange-500 to-red-500',
+    'bg-linear-to-br from-violet-500 to-purple-500',
+    'bg-linear-to-br from-amber-500 to-orange-500',
+    'bg-linear-to-br from-green-500 to-emerald-500',
+    'bg-linear-to-br from-rose-500 to-pink-500',
+    'bg-linear-to-br from-indigo-500 to-blue-500',
+    'bg-linear-to-br from-sky-500 to-blue-500',
   ];
 
   const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -72,7 +72,7 @@ const UserAvatar = ({ user, size = 'md' }) => {
     />
   ) : (
     <div
-      className={`rounded-full ${sizeClasses[size]} bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold border-2 border-white shadow-sm`}
+      className={`rounded-full ${sizeClasses[size]} bg-linear-to-br ${color} flex items-center justify-center text-white font-bold border-2 border-white shadow-sm`}
     >
       {initials}
     </div>
@@ -257,11 +257,11 @@ const Navbar = () => {
             className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
             onClick={() => router.push('/')}
           >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h1 className="text-base sm:text-lg font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 ProfileManager
               </h1>
               <p className="text-xs text-gray-600 hidden sm:block">
@@ -298,7 +298,7 @@ const Navbar = () => {
                     tabIndex={-1}
                     className="dropdown-content menu bg-white rounded-xl z-50 mt-2 w-64 sm:w-72 p-2 shadow-xl border border-slate-300"
                   >
-                    <li className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 mb-2">
+                    <li className="p-3 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 mb-2">
                       <div className="flex items-center gap-3">
                         <UserAvatar user={user} size="lg" />
                         <div className="flex-1 min-w-0">
@@ -356,7 +356,7 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => setShowLoginModal(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
+                  className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
                 >
                   <Key className="w-4 h-4" />
                   <span>Sign In</span>
@@ -404,7 +404,7 @@ const Navbar = () => {
           ) : (
             <button
               onClick={() => setShowLoginModal(true)}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 font-medium"
+              className="w-full bg-linear-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 font-medium"
             >
               <Key className="w-4 h-4" />
               Sign In
@@ -418,10 +418,10 @@ const Navbar = () => {
         <div className="modal modal-open">
           <div className="modal-box relative bg-white border border-gray-300 rounded-xl p-0 overflow-hidden w-[95vw] max-w-md sm:max-w-2xl max-h-[90vh] overflow-y-auto text-gray-900">
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-300 p-4 sm:p-6">
+            <div className="sticky top-0 z-10 bg-linear-to-r from-blue-50 to-purple-50 border-b border-gray-300 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
                     <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
@@ -545,7 +545,7 @@ const Navbar = () => {
                         Cancel
                       </button>
                       <button
-                        className="btn bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 flex-1 gap-2 shadow-md hover:shadow-lg font-medium"
+                        className="btn bg-linear-to-r from-blue-600 to-purple-600 text-white border-0 flex-1 gap-2 shadow-md hover:shadow-lg font-medium"
                         onClick={handleProfileUpdate}
                         disabled={isUpdatingProfile}
                       >
@@ -585,7 +585,7 @@ const Navbar = () => {
                 Cancel
               </button>
               <button
-                className="btn bg-gradient-to-r from-amber-500 to-orange-500 text-white flex-1 font-medium gap-2"
+                className="btn bg-linear-to-r from-amber-500 to-orange-500 text-white flex-1 font-medium gap-2"
                 onClick={handleLogout}
               >
                 <LogOut className="w-4 h-4" /> Logout
@@ -651,7 +651,7 @@ const Navbar = () => {
             </button>
             <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center shadow-md">
                   <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
@@ -683,7 +683,7 @@ const Navbar = () => {
                   </div>
                 )}
                 <button
-                  className="btn bg-gradient-to-r from-red-600 to-pink-600 text-white w-full gap-2 rounded-lg disabled:opacity-50 font-medium text-sm"
+                  className="btn bg-linear-to-r from-red-600 to-pink-600 text-white w-full gap-2 rounded-lg disabled:opacity-50 font-medium text-sm"
                   onClick={handleDeleteAccount}
                   disabled={isDeleting || deleteConfirm !== 'DELETE'}
                 >

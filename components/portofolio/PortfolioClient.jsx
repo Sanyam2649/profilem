@@ -103,7 +103,7 @@ export default function PortfolioClient({ profileId }) {
   if (isLoading)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
+        <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
           <Sparkles className="w-7 h-7 text-white animate-spin" />
         </div>
       </div>
@@ -158,17 +158,17 @@ export default function PortfolioClient({ profileId }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="relative min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-purple-50">
 
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-40">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all no-print"
+          className="h-full bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 transition-all no-print"
           style={{ width: `${scrollProgress}%` }}
         />
            <button
         onClick={() =>window.print()}
-        className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg z-50"
+        className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg z-50"
       >
         <Download className="w-5 h-5 no-print" />
         <span>Download</span>
@@ -195,7 +195,7 @@ export default function PortfolioClient({ profileId }) {
       {scrollProgress > 10 && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="no-print fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-50"
+          className="no-print fixed bottom-8 right-8 w-12 h-12 bg-linear-to-r from-blue-500 to-purple-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-50"
         >
           <ChevronDown className="w-5 h-5 rotate-180 no-print" />
         </button>

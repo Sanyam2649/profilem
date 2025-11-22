@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
+import Image from 'next/image';
 
 const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
   const router = useRouter();
@@ -75,10 +76,10 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
             <label className="cursor-pointer group">
 
               {/* Avatar Circle */}
-              <div className="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden mx-auto -mt-16 bg-slate-200 group-hover:opacity-80 transition">
+              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-white shadow-md overflow-hidden mx-auto -mt-16 bg-slate-200 group-hover:opacity-80 transition">
 
                 {formData.avatarPreview ? (
-                  <img
+                  <Image
                     src={formData.avatarPreview}
                     alt="avatar"
                     className="w-full h-full object-cover"
@@ -160,7 +161,7 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
 
         <button
           type="submit"
-          className="btn bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 mt-4 w-full rounded-xl"
+          className="btn bg-linear-to-r from-blue-600 to-purple-600 text-white border-0 mt-4 w-full rounded-xl"
           disabled={isLoading}
         >
           {isLoading ? <span className="loading loading-spinner loading-sm" /> : "Register"}
@@ -173,6 +174,7 @@ const RegisterModal = ({ onSwitchToLogin, onSuccess }) => {
           </strong>
         </p>
       </fieldset>
+      
 
     </form>
   );

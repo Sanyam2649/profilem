@@ -7,6 +7,7 @@ import RegisterModal from '@/components/register';
 import Button from '@/components/button';
 import { useUser } from '@/contexts/UserContext';
 import Image from 'next/image';
+import { X } from 'lucide-react';
 
 const Home = () => {
   const router = useRouter();
@@ -29,16 +30,16 @@ const Home = () => {
   const goToDashboard = () => router.push('/dashboard');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="text-center w-full max-w-sm sm:max-w-md md:max-w-lg space-y-10">
 
         {/* Heading */}
         <div className="space-y-5">
           <div className="relative inline-block px-2">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
               ProfileManager
             </h1>
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-full"></div>
           </div>
 
           <p className="text-base sm:text-lg md:text-xl text-slate-600 font-light px-3">
@@ -96,7 +97,7 @@ const Home = () => {
               <Button
                 title="Go to Dashboard"
                 onClick={goToDashboard}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
+                className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
               />
 
               <Button
@@ -109,8 +110,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Modal Overlay */}
-      {activeModal && (
+      {/* {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6">
           <div className="w-full max-w-sm sm:max-w-md bg-white shadow-2xl rounded-2xl p-6 relative animate-in fade-in-90 zoom-in-90">
             <button
@@ -135,7 +135,57 @@ const Home = () => {
             )}
           </div>
         </div>
-      )}
+      )} */}
+      
+      {/* Login Modal */}
+{activeModal === 'login' && (
+  <dialog className="modal modal-open">
+    <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
+      
+      <button
+        className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 hover:bg-gray-200 text-gray-700"
+        onClick={closeModal}
+      >
+        <X className="w-4 h-4" />
+      </button>
+
+      <div className="p-4 sm:p-6 text-gray-900">
+        <LoginForm
+          onSuccess={closeModal}
+          onClose={closeModal}
+          onSwitchToRegister={() => setActiveModal('register')}
+        />
+      </div>
+    </div>
+
+    <div className="modal-backdrop bg-black/50" onClick={closeModal} />
+  </dialog>
+)}
+
+{/* Register Modal */}
+{activeModal === 'register' && (
+  <dialog className="modal modal-open">
+    <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md overflow-y-auto scrollbar-none">
+      
+      <button
+        className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 hover:bg-gray-200 text-gray-700"
+        onClick={closeModal}
+      >
+        <X className="w-4 h-4" />
+      </button>
+
+      <div className="p-4 sm:p-6 text-gray-900">
+        <RegisterModal
+          onSuccess={closeModal}
+          onSwitchToLogin={() => setActiveModal('login')}
+        />
+      </div>
+
+    </div>
+    <div className="modal-backdrop bg-black/50" onClick={closeModal} />
+  </dialog>
+)}
+
 
       {/* Logout Modal */}
       {showLogoutModal && (
@@ -178,7 +228,7 @@ const Home = () => {
 
                 <button
                   onClick={confirmLogout}
-                  className="btn flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl py-2 sm:py-3 font-medium shadow-lg hover:shadow-xl"
+                  className="btn flex-1 bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl py-2 sm:py-3 font-medium shadow-lg hover:shadow-xl"
                 >
                   Yes, Logout
                 </button>

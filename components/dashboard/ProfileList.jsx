@@ -32,9 +32,9 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg">
-      <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-blue-200">
+      <div className="bg-linear-to-br from-white to-blue-50 rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-blue-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-3xl">
+        <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-linear-to-r from-blue-600 to-purple-600 rounded-t-3xl">
           <h3 className="text-lg font-bold text-white">
             Portfolio Options
           </h3>
@@ -51,7 +51,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
           {/* Profile Info */}
           <div className="flex items-center gap-4">
             <div className="avatar placeholder">
-             <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+             <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">
                   {profile.personal.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
                 </span>
@@ -81,7 +81,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
               />
               <button
                 onClick={handleCopyLink}
-                className="btn bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 btn-square"
+                className="btn bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 btn-square"
                 title="Copy link"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -96,7 +96,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
                 window.open(portfolioUrl, '_blank');
                 onClose();
               }}
-              className="btn bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 w-full gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+              className="btn bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 w-full gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
             >
               <Eye className="w-5 h-5" />
               View Portfolio
@@ -109,7 +109,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
   <div className="grid grid-cols-2 gap-3">
     <button
       onClick={() => handleShare('twitter')}
-      className="btn bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+      className="btn bg-linear-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
     >
       <span className="font-bold text-lg">𝕏</span>
       Twitter
@@ -117,7 +117,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
     
     <button
       onClick={() => handleShare('linkedin')}
-      className="btn bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+      className="btn bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
     >
       <svg className="w-5 h-5" viewBox="0 -2 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
         <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -131,7 +131,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
     
     <button
       onClick={() => handleShare('facebook')}
-      className="btn bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+      className="btn bg-linear-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
     >
       <svg className="w-5 h-5" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
         <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -145,7 +145,7 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
     
     <button
       onClick={() => handleShare('whatsapp')}
-      className="btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+      className="btn bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
     >
       <svg className="w-5 h-5" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
         <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -189,12 +189,12 @@ const ProfileList = ({
 
   if (isLoading) {
     return (
-      <div className="card bg-gradient-to-br from-white to-blue-50 shadow-2xl border-2 border-blue-200 rounded-3xl">
+      <div className="card bg-linear-to-br from-white to-blue-50 shadow-2xl border-2 border-blue-200 rounded-3xl">
         <div className="card-body">
           <div className="overflow-x-auto">
             <table className="table w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                <tr className="bg-linear-to-r from-blue-500 to-purple-500 text-white">
                   <th className="w-12 text-center rounded-tl-2xl">#</th>
                   <th>Name</th>
                   <th>Email</th>
@@ -207,13 +207,13 @@ const ProfileList = ({
               <tbody>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <tr key={i} className="hover:bg-blue-50 transition-colors">
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-8 animate-pulse mx-auto"></div></td>
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-32 animate-pulse"></div></td>
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-40 animate-pulse"></div></td>
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-24 animate-pulse"></div></td>
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-16 animate-pulse"></div></td>
-                    <td><div className="h-4 bg-gradient-to-r from-blue-200 to-purple-200 rounded w-16 animate-pulse"></div></td>
-                    <td><div className="h-8 bg-gradient-to-r from-blue-200 to-purple-200 rounded animate-pulse"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-8 animate-pulse mx-auto"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-32 animate-pulse"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-40 animate-pulse"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-24 animate-pulse"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-16 animate-pulse"></div></td>
+                    <td><div className="h-4 bg-linear-to-r from-blue-200 to-purple-200 rounded w-16 animate-pulse"></div></td>
+                    <td><div className="h-8 bg-linear-to-r from-blue-200 to-purple-200 rounded animate-pulse"></div></td>
                   </tr>
                 ))}
               </tbody>
@@ -228,12 +228,12 @@ const ProfileList = ({
    (profiles.length > 0 &&  <>
       <div className="space-y-6">
         {/* Table */}
-        <div className="card bg-gradient-to-br from-white to-blue-50 text-gray-800 shadow-2xl border-2 border-blue-200 rounded-3xl overflow-hidden">
+        <div className="card bg-linear-to-br from-white to-blue-50 text-gray-800 shadow-2xl border-2 border-blue-200 rounded-3xl overflow-hidden">
           <div className="card-body p-0">
             <div className="overflow-x-auto">
               <table className="table w-full border-separate table-auto">
                 <thead>
-                  <tr className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-bold">
+                  <tr className="bg-linear-to-r from-blue-500 to-purple-500 text-white text-sm font-bold">
                     <th className="w-12 text-center py-4 rounded-tl-3xl justify-center">#</th>
                     <th className="py-4">Profile</th>
                     <th className="py-4">Email</th>
@@ -251,7 +251,7 @@ const ProfileList = ({
                       <td className="py-4">
                         <div className="flex items-center gap-4">
                           <div className="avatar placeholder">
-                           <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                           <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
                               <span className="text-white font-bold text-sm">
                                 {profile?.personal?.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
                               </span>
@@ -284,7 +284,7 @@ const ProfileList = ({
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handlePortfolioAction(profile)}
-                            className="btn bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 btn-sm gap-1 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                            className="btn bg-linear-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 btn-sm gap-1 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
                             title="Portfolio Options"
                             disabled={!profile._id}
                           >
@@ -292,14 +292,14 @@ const ProfileList = ({
                           </button>
                           <button
                             onClick={() => onEdit(profile)}
-                            className="btn bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 btn-sm shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                            className="btn bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 btn-sm shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
                             title="Edit Profile"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => profile._id && onDelete(profile?._id)}
-                            className="btn bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0 btn-sm shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                            className="btn bg-linear-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0 btn-sm shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
                             title="Delete Profile"
                             disabled={!profile._id}
                           >
@@ -326,7 +326,7 @@ const ProfileList = ({
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="btn bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 btn-sm gap-2 shadow-md hover:shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:hover:from-gray-400 disabled:hover:to-gray-500 transform hover:-translate-y-1 transition-all duration-200"
+                className="btn bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 btn-sm gap-2 shadow-md hover:shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:hover:from-gray-400 disabled:hover:to-gray-500 transform hover:-translate-y-1 transition-all duration-200"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Previous
@@ -351,8 +351,8 @@ const ProfileList = ({
                       onClick={() => setCurrentPage(pageNum)}
                       className={`btn btn-sm min-w-10 font-bold ${
                         currentPage === pageNum 
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg' 
-                          : 'bg-gradient-to-r from-blue-100 to-purple-100 text-gray-700 border border-blue-200 hover:from-blue-200 hover:to-purple-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200'
+                          ? 'bg-linear-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg' 
+                          : 'bg-linear-to-r from-blue-100 to-purple-100 text-gray-700 border border-blue-200 hover:from-blue-200 hover:to-purple-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200'
                       }`}
                     >
                       {pageNum}
@@ -364,7 +364,7 @@ const ProfileList = ({
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="btn bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 btn-sm gap-2 shadow-md hover:shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:hover:from-gray-400 disabled:hover:to-gray-500 transform hover:-translate-y-1 transition-all duration-200"
+                className="btn bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 btn-sm gap-2 shadow-md hover:shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:hover:from-gray-400 disabled:hover:to-gray-500 transform hover:-translate-y-1 transition-all duration-200"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />

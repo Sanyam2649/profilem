@@ -34,7 +34,7 @@ const SearchBar = ({
 
         <button
           type="submit"
-          className="btn bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 join-item"
+          className="btn bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 join-item"
         >
           <Search className="w-4 h-4" />
         </button>

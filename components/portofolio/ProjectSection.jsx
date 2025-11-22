@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Code, Calendar, Github, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { HeaderTag } from "./Cards";
 
 export default function ProjectsSection({ projects = [] }) {
   const scrollRef = useRef(null);
@@ -53,21 +54,8 @@ export default function ProjectsSection({ projects = [] }) {
   return (
     <section className="relative py-16 px-6">
       <div className="mx-auto">
-        {/* HEADER */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white border rounded-xl shadow-sm">
-            <Code className="w-4 h-4 text-emerald-600" />
-            <span className="font-semibold text-gray-700">
-              Project Portfolio
-            </span>
-          </div>
+        <HeaderTag title="Projects" subtitle="Project Portfolio" icon={<Code className="w-4 h-4 text-emerald-600" />}/> 
 
-          <h2 className="text-4xl sm:text-5xl font-black mt-4 bg-gradient-to-r from-gray-900 to-emerald-800 text-transparent bg-clip-text">
-            Featured Projects
-          </h2>
-        </div>
-
-        {/* SCROLL ARROWS */}
         {showArrows && (
           <div className="flex justify-end gap-3 mb-4">
             {/* LEFT BUTTON */}
@@ -107,7 +95,7 @@ export default function ProjectsSection({ projects = [] }) {
           {projects.map((p, i) => (
             <div
               key={i}
-              className="snap-center flex-shrink-0 w-[300px]" // NO HALF CARDS, FIXED WIDTH
+              className="snap-center shrink-0 w-[300px]"
             >
               <ProjectCard project={p} />
             </div>
