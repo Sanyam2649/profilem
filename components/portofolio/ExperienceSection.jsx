@@ -34,7 +34,7 @@ export default function ExperienceSection({ experiences = [] }) {
     scrollRef.current?.scrollBy({ left: 320, behavior: "smooth" });
 
   return (
-    <section className="relative py-16 px-4">
+    <section className="relative px-4">
       <div className="mx-auto">
         <HeaderTag title="Experience" subtitle="Professional Journey" icon={<span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />} />
 

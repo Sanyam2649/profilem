@@ -29,7 +29,7 @@ export default function SkillsSection({ skills }) {
   }
 
   return (
-    <section className="relative py-20 px-6">
+    <section className="relative px-6">
       <div className="absolute inset-0"/>
       <div className="relative max-w-7xl mx-auto z-10">
 

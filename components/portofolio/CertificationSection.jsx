@@ -41,7 +41,7 @@ export default function CertificationsSection({ certifications }) {
   };
 
   return (
-    <section className="w-full py-20">
+    <section className="w-full">
       <div className="px-6">
 
         {/* HEADER */}

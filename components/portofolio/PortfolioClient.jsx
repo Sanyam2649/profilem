@@ -230,7 +230,7 @@ const renderSection = (section, index) => {
 
       {/* MAIN CONTENT */}
       <main className="relative z-10">
-        <div className="container mx-auto px-6 w-full pb-24">
+        <div className="container mx-auto px-6 w-full">
 
           {rawSections.map((section, index) => renderSection(section, index))}
 

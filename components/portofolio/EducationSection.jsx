@@ -12,20 +12,20 @@ export default function EducationSection({ education = [] }) {
 
   const scrollLeft = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
-      setScrollPosition(containerRef.current.scrollLeft - 400);
+      containerRef.current.scrollBy({ left: -100, behavior: 'smooth' });
+      setScrollPosition(containerRef.current.scrollLeft - 100);
     }
   };
 
   const scrollRight = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
-      setScrollPosition(containerRef.current.scrollLeft + 400);
+      containerRef.current.scrollBy({ left: 100, behavior: 'smooth' });
+      setScrollPosition(containerRef.current.scrollLeft + 100);
     }
   };
 
   return (
-    <section className="relative w-full py-24 md:py-32 overflow-hidden">
+    <section className="relative w-full overflow-hidden">
       <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
         <HeaderTag

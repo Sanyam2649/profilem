@@ -52,7 +52,7 @@ export default function ProjectsSection({ projects = [] }) {
   }, [projects]);
 
   return (
-    <section className="relative py-16 px-6">
+    <section className="relative px-6">
       <div className="mx-auto">
         <HeaderTag title="Projects" subtitle="Project Portfolio" icon={<Code className="w-4 h-4 text-emerald-600" />}/> 
 
@@ -92,14 +92,15 @@ export default function ProjectsSection({ projects = [] }) {
             snap-x snap-mandatory pb-4 pt-2
           "
         >
-          {projects.map((p, i) => (
-            <div
-              key={i}
-              className="snap-center shrink-0 w-[300px]"
-            >
-              <ProjectCard project={p} />
-            </div>
-          ))}
+        {projects.map((p, i) => (
+  <div
+    key={i}
+    className="snap-center shrink-0 w-72 sm:w-80 md:w-96"
+  >
+    <ProjectCard project={p} />
+  </div>
+))}
+
         </div>
       </div>
     </section>
