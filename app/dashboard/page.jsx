@@ -211,32 +211,49 @@ const handleCloseModal = () => {
     }
   };
 
+// Prevent window close, refresh, or navigation while form modal is open
 useEffect(() => {
   if (!isFormModalOpen) return;
 
+  // 1. Prevent closing browser/tab refresh
   const handleBeforeUnload = (e) => {
     e.preventDefault();
-    e.returnValue = ""; // Required for Chrome
-    return "";
+    e.returnValue = ""; // Chrome requires this
   };
 
-  const handleRouteChangeStart = (url) => {
-    if (!confirm("You have unsaved changes. Do you really want to leave?")) {
-      // Cancel route change
-      router.push(router.asPath);
-      throw "Route Change Aborted";
+  // 2. Prevent browser back button
+  const handlePopState = () => {
+    const confirmed = confirm("You have unsaved changes. Do you really want to leave?");
+    if (!confirmed) {
+      // push user back to same page
+      window.history.pushState(null, "", window.location.href);
     }
   };
 
+  // 3. Prevent Next.js route changes (App Router)
+  const handleRouteChange = () => {
+    const confirmed = confirm("You have unsaved changes. Do you really want to leave?");
+    if (!confirmed) {
+      throw "Navigation aborted";
+    }
+  };
+
+  // Bind listeners
   window.addEventListener("beforeunload", handleBeforeUnload);
-  window.addEventListener("popstate", handleRouteChangeStart);
+  window.addEventListener("popstate", handlePopState);
+
+  // For Next.js router navigation
+  router.events?.on("routeChangeStart", handleRouteChange);
+
+  // Push initial history state to trap back button
+  window.history.pushState(null, "", window.location.href);
 
   return () => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
-    window.removeEventListener("popstate", handleRouteChangeStart);
+    window.removeEventListener("popstate", handlePopState);
+    router.events?.off("routeChangeStart", handleRouteChange);
   };
 }, [isFormModalOpen, router]);
-
 
 
 
