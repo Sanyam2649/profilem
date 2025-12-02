@@ -64,7 +64,7 @@ const UserAvatar = ({ user, size = 'md' }) => {
 
   return user.avatar ? (
     <Image
-      src={user?.avatar?.url}
+      src={user?.avatar?.url ? user?.avatar?.url : user?.avatar}
       alt="avatar"
       width={40}
       height={40}
@@ -84,7 +84,7 @@ const UserAvatar = ({ user, size = 'md' }) => {
 // -----------------------------
 const Navbar = () => {
   const router = useRouter();
-  const { user, login, logout } = useUser();
+  const { user, login, logout, authenticatedFetch, setUser } = useUser();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -160,8 +160,6 @@ const Navbar = () => {
     setProfileSuccess('');
 
     const fd = new FormData();
-    const userId = user?._id;
-    fd.append("userId", userId);
     fd.append("name", profileData.name);
     fd.append("email", profileData.email);
 
@@ -170,9 +168,9 @@ const Navbar = () => {
     }
     
     try {
-      const response = await fetch('/api/user/update', {
+      const response = await authenticatedFetch('/api/user/update', {
         method: 'PATCH',
-         body: fd,
+        body: fd,
       });
       
       if (!response.ok) {
@@ -183,7 +181,9 @@ const Navbar = () => {
       const data = await response.json();
       const updatedUser = data.user;
       
-      login(updatedUser);
+      // Update user in context (but keep tokens)
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       setProfileSuccess('Profile updated successfully!');
       
       setTimeout(() => setProfileSuccess(''), 3000);
@@ -192,7 +192,7 @@ const Navbar = () => {
     } finally {
       setIsUpdatingProfile(false);
     }
-  }, [user, profileData, login]);
+  }, [user, profileData, authenticatedFetch, setUser]);
 
   const handleProfileChange = useCallback((field, value) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
@@ -221,7 +221,7 @@ const Navbar = () => {
     setProfileError('');
     
     try {
-      const response = await fetch(`/api/user/${user._id}`, {
+      const response = await authenticatedFetch(`/api/user/${user._id}`, {
         method: 'DELETE',
       });
       
@@ -236,7 +236,7 @@ const Navbar = () => {
     } finally {
       setIsDeleting(false);
     }
-  }, [user, deleteConfirm, handleLogout]);
+  }, [user, deleteConfirm, handleLogout, authenticatedFetch]);
 
   const closeModals = useCallback(() => {
     setShowLoginModal(false);
@@ -462,28 +462,47 @@ const Navbar = () => {
                     />
 
                     {/* Clickable Avatar */}
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => document.getElementById("avatarInput").click()}
-                    >
-                      {profileData?.avatar?.url ? (
-                        <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full shadow-md overflow-hidden mb-3 border-4 border-white">
-                          <Image
-                            src={profileData.avatar.url}
-                            alt="Profile Avatar"
-                            width={120}
-                            height={120}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center 
-          text-white text-2xl font-bold mx-auto mb-3 shadow-md 
-          ${getAvatarColor(profileData.name || user.name)}`}
+                    <div className="relative inline-block">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => document.getElementById("avatarInput").click()}
+                      >
+                        {profileData?.avatar ? (
+                          <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full shadow-md overflow-hidden mb-3 border-4 border-white">
+                            <Image
+                              src={typeof profileData.avatar === 'string' ? profileData.avatar : profileData.avatar.url}
+                              alt="Profile Avatar"
+                              width={120}
+                              height={120}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center 
+            text-white text-2xl font-bold mx-auto mb-3 shadow-md 
+            ${getAvatarColor(profileData.name || user.name)}`}
+                          >
+                            {getNameInitials(profileData.name || user.name)}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Delete Avatar Button */}
+                      {profileData?.avatar && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleProfileChange("avatar", "");
+                            handleProfileChange("avatarFile", null);
+                            handleProfileChange("removeAvatar", true);
+                          }}
+                          className="absolute top-0 right-0 sm:right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-colors"
+                          title="Remove avatar"
                         >
-                          {getNameInitials(profileData.name || user.name)}
-                        </div>
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       )}
                     </div>
 
@@ -519,7 +538,7 @@ const Navbar = () => {
                         type="email"
                         className="input input-bordered w-full bg-white border-gray-400 text-gray-900 placeholder-gray-500"
                         value={profileData.email}
-                        onChange={(e) => handleProfileChange('email', e.target.value)}
+                        readOnly
                         placeholder="Enter your email"
                       />
                     </div>

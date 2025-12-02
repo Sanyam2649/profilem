@@ -1,220 +1,406 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-const { ChevronUp, ChevronDown, BookOpen, GraduationCap, Calendar } = require("lucide-react");
+import {
+  ChevronUp,
+  ChevronDown,
+  GraduationCap,
+  Calendar,
+  Briefcase,
+  Link as LinkIcon,
+  Award,
+  Code,
+  Star,
+  ExternalLink
+} from "lucide-react";
 
 
-export  function EducationCard ({education , index}) {
-  const [expanded, setExpanded] = useState(null);
-  const toggle = (i) => setExpanded(expanded === i ? null : i);
-  const isOpen = expanded === index;
-   return (
-              <div
-                key={index}
-                className="snap-center flex-[0_0_88%] sm:flex-[0_0_48%] lg:flex-[0_0_38%]
-                bg-white rounded-3xl p-8 border border-[#ded7cc]
-                shadow-[0_8px_20px_rgba(0,0,0,0.08)]
-                hover:shadow-[0_12px_26px_rgba(0,0,0,0.12)]
-                transition-all duration-500 relative group"
-              >
-                {/* Ink Outline Hover */}
-                <div className="absolute inset-0 rounded-3xl border border-[#9b886c]/30 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none" />
 
-                {/* HEADER */}
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-[#84664b] to-[#5c3f2d] text-white flex items-center justify-center shadow-inner">
-                    <GraduationCap className="w-7 h-7" />
-                  </div>
+/* DATE FORMATTER */
+const formatDate = (d) =>
+  d ? new Date(d).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : null;
 
-                  <div className="min-w-0">
-                    <h3 className="text-2xl font-serif font-bold text-[#2f1e14] truncate">
-                      {education.institution}
-                    </h3>
-
-                    <div className="flex items-center gap-2 text-[#6e5a46] text-sm mt-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        {new Date(education.startDate).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                        })}
-                        {" — "}
-                        {education.endDate
-                          ? new Date(education.endDate).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                            })
-                          : "Present"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* DEGREE */}
-                <div className="mt-6">
-                  <h4 className="text-xl font-serif font-bold text-[#3b2a1d]">
-                    {education.degree}
-                  </h4>
-
-                  <div className="flex items-center gap-2 text-[#6e5a46] mt-1 text-sm">
-                    <BookOpen className="w-4 h-4" />
-                    <span className="font-medium">{education.fieldOfStudy}</span>
-                  </div>
-                </div>
-
-                {/* DESCRIPTION */}
-                {education.description && (
-                  <div className="mt-6 border-t border-[#e0d8ce] pt-4">
-                    <p
-                      className={`text-[#5a4a38] leading-relaxed transition-all duration-500 ${
-                        isOpen ? "line-clamp-none" : "line-clamp-3"
-                      }`}
-                    >
-                      {education?.description}
-                    </p>
-
-                    {education?.description.length > 120 && (
-                      <button
-                        onClick={() => toggle(i)}
-                        className="flex items-center gap-2 text-[#6d4f31] hover:text-[#5a3d2b] font-semibold mt-3 text-sm"
-                      >
-                        {isOpen ? (
-                          <>
-                            <ChevronUp className="w-4 h-4" /> Show Less
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="w-4 h-4" /> Read More
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-}
-
-
-export function HeaderTag({icon , title , subtitle}){
+/* RESPONSIVE, CLEAN, HIGH-CONTRAST BASE CARD */
+export function BaseCard({
+  icon,
+  title,
+  subtitle,
+  tag,
+  children,
+  footer,
+  className = "",
+}) {
   return (
-     <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white border border-gray-300 shadow-sm">
-            {icon}
-            <span className="text-sm font-semibold text-[#5a3d2b] tracking-wide">
-              {subtitle}
-            </span>
-          </div>
-
-          <h2 className="mt-5 text-5xl md:text-6xl font-serif font-bold tracking-tight text-[#2f1e14]">
-            {title}
-          </h2>
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ duration: 0.25 }}
+      className={`
+        relative rounded-3xl p-6 backdrop-blur-xl
+        bg-blur
+        border shadow-[0_8px_30px_rgba(0,0,0,0.08)]
+        dark:bg-slate-900/40 dark:border-slate-700
+        ${className}
+      `}
+    >
+      {/* HEADER */}
+      <div className="flex items-start gap-5">
+        <div
+          className="
+            w-14 h-14 rounded-2xl flex items-center justify-center
+            bg-[#00ADB5] text-white shadow-md 
+          "
+        >
+          {icon}
         </div>
-  )
-}
 
-export function ExperienceCard ({experience , index})
-{
-  const [expandedCard, setExpandedCard] = useState(null);
-    const formatDate = (d) => {
-    if (!d) return "Present";
-    return new Date(d).toLocaleDateString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
-  };
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3">
+            <h3
+              className="
+                text-xl font-serif font-bold tracking-tight 
+                text-[#00ADB5] truncate
+              "
+            >
+              {title}
+            </h3>
 
-  const calcDuration = (start, end) => {
-    const s = new Date(start);
-    const e = end ? new Date(end) : new Date();
-
-    const months =
-      (e.getFullYear() - s.getFullYear()) * 12 +
-      (e.getMonth() - s.getMonth());
-
-    const years = Math.floor(months / 12);
-    const rem = months % 12;
-
-    if (months <= 0) return "0 mos";
-    if (years === 0) return `${rem} mos`;
-    if (rem === 0) return `${years} yrs`;
-    return `${years} yrs ${rem} mos`;
-  };
-   const expanded = expandedCard === index;
-    return (
-              <div
-                key={index}
+            {tag && (
+              <span
                 className="
-                  snap-center shrink-0
-                  w-[300px] 
+                  ml-auto text-xs px-3 py-1 rounded-full 
+                  bg-white/90 dark:bg-white/10 
+                  text-slate-700 dark:text-slate-300 
+                  font-semibold
                 "
               >
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="p-6">
+                {tag}
+              </span>
+            )}
+          </div>
 
-                    {/* TITLE */}
-                    <h3 className="text-lg font-extrabold text-[#0b1220] leading-snug">
-                      {experience.position}
-                    </h3>
+          {subtitle && (
+            <p className="text-xs mt-1 text-slate-600 dark:text-slate-400 truncate">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </div>
+      {children && (
+        <div className="mt-5 text-sm text-slate-800 dark:text-slate-300 leading-relaxed">
+          {children}
+        </div>
+      )}
 
-                    <p className="mt-1 text-sm font-semibold text-gray-600 truncate">
-                      {experience.company}
-                    </p>
+      {/* FOOTER */}
+      {footer && <div className="mt-6">{footer}</div>}
+    </motion.article>
+  );
+}
 
-                    {/* DATES */}
-                    <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-gray-600">
-                      <span className="px-2 py-1 bg-gray-100 rounded-full">
-                        {formatDate(experience.startDate)} – {formatDate(experience.endDate)}
-                      </span>
+/* -------------------------------------------------------------------------- */
+/* PROJECT CARD – AUTO DATE RANGE BASED ON JSON */
+/* -------------------------------------------------------------------------- */
 
-                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full font-semibold">
-                        {calcDuration(experience.startDate, experience.endDate)}
-                      </span>
-                      
-                            {experience.responsibilities?.length > 3 && (
-                      <button
-                        className="px-4"
-                        onClick={() => setExpandedCard(expanded ? null : index)}>
-                        {expanded ? <ChevronUp /> : <ChevronDown />}
-                      </button>
-                    )}
-                    </div>
+export function ProjectCard({ project }) {
+  const [open, setOpen] = useState(false);
 
-                    {/* RESPONSIBILITIES */}
-                    {experience.responsibilities?.length > 0 && (
-                      <div
-                        className={`mt-4 text-gray-700 transition-all duration-300 ${
-                          expanded
-                            ? "max-h-[1200px]"
-                            : "max-h-20 overflow-hidden"
-                        }`}
-                      >
-                        <ul className="space-y-2">
-                          {(expanded
-                            ? experience.responsibilities
-                            : experience.responsibilities.slice(0, 3)
-                          ).map((r, idx) => (
-                            <li key={idx} className="flex gap-2 items-start">
-                              <span className="w-2 h-2 mt-2 rounded-full bg-blue-500 shrink-0" />
-                              <p className="text-sm leading-relaxed">{r}</p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {experience.technologies?.length > 0 && (
-                      <div className="mt-5 pt-4 border-t border-gray-200 flex flex-wrap gap-2">
-                        {experience.technologies.map((tech, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 rounded-full bg-gray-50 border text-xs text-gray-700"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+  const desc = project.description || "";
+  const TRUNC = 160;
+  const short = desc.slice(0, TRUNC) + (desc.length > TRUNC ? "..." : "");
 
-                  </div>
-                </div>
-              </div>
-            );
+  /* Auto-generate date subtitle ONLY if startDate exists */
+  const start = project.startDate ? formatDate(project.startDate) : null;
+  const end =
+    project.startDate
+      ? project.endDate
+        ? formatDate(project.endDate)
+        : "Present"
+      : "";
+
+  const finalSubtitle = start ? `${start} — ${end}` : "";
+
+  /* Tech parsing */
+  const tech = Array.isArray(project.technologies)
+    ? project.technologies
+    : (project.technologies || "")
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean);
+
+  const footer = (
+    <div className="flex flex-wrap gap-3">
+      {project.link && (
+        <a
+          href={project.link}
+          target="_blank"
+          className="px-4 py-2 rounded-xl bg-[#00ADB5] text-white text-sm font-semibold hover:bg-white hover:text-[#00ADB5]"
+        >
+          Live Demo
+        </a>
+      )}
+
+      {project.github && (
+        <a
+          href={project.github}
+          target="_blank"
+          className="
+            px-4 py-2 rounded-xl bg-white border text-slate-700 
+            text-sm font-semibold 
+            dark:bg-slate-800 dark:border-slate-700 dark:text-white
+            hover:bg-[#00ADB5]
+          "
+        >
+          GitHub
+        </a>
+      )}
+    </div>
+  );
+
+  return (
+    <BaseCard
+      icon={<Code className="w-6 h-6" />}
+      title={project.name}
+      subtitle={finalSubtitle}
+      footer={footer}
+    >
+      <div>
+        <AnimatePresence initial={false}>
+          <motion.p
+            key={open ? "open" : "closed"}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            {open ? desc : short}
+          </motion.p>
+        </AnimatePresence>
+
+        {desc.length > TRUNC && (
+          <button
+            onClick={() => setOpen(!open)}
+            className="
+              mt-3 text-[#00ADB5] 
+              font-semibold text-sm hover:underline
+            "
+          >
+            {open ? "Show less" : "Read more"}
+          </button>
+        )}
+
+        {tech.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {tech.map((t, i) => (
+              <span
+                key={i}
+                className="
+                  text-xs px-3 py-1 rounded-full 
+                  bg-blur border text-white hover:bg-[#00ADB5]                "
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </BaseCard>
+  );
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SKILLS CARD – PARSE skills STRING INTO ARRAY */
+/* -------------------------------------------------------------------------- */
+
+export function SkillsCard({ title, skills = [], Icon = Star }) {
+  const skillArray = Array.isArray(skills)
+    ? skills
+    : skills
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean);
+
+  return (
+    <BaseCard
+      icon={<Icon className="w-6 h-6" />}
+      title={title}
+      subtitle={`${skillArray.length} skills`}
+      accent="rose"
+    >
+      <div className="flex flex-wrap gap-2">
+        {skillArray.map((s, i) => (
+          <span
+            key={i}
+            className="
+              px-3 py-1 rounded-full 
+              bg-blur border hover:bg-[#00ADB5] text-white text-xs 
+            "
+          >
+            {s}
+          </span>
+        ))}
+      </div>
+    </BaseCard>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* EDUCATION CARD – BASED ON JSON */
+/* -------------------------------------------------------------------------- */
+
+export function EducationCard({ education }) {
+  const [open, setOpen] = useState(false);
+  const long = education?.description?.length > 160;
+
+  const start = formatDate(education.startDate);
+  const end = education.endDate ? formatDate(education.endDate) : "Present";
+
+  return (
+    <BaseCard
+      icon={<GraduationCap className="w-6 h-6" />}
+      title={education.institution}
+      subtitle={`${education.degree} • ${education.fieldOfStudy}`}
+      accent="indigo"
+    >
+      <div className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2">
+        <Calendar className="w-4 h-4" />
+        <span>
+          {start} — {end}
+        </span>
+      </div>
+
+      <div className="mt-3">
+        <AnimatePresence initial={false}>
+          <motion.p
+            key={open ? "open" : "closed"}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed"
+          >
+            {open
+              ? education.description
+              : (education.description?.slice(0, 160) || "") +
+                (long ? "..." : "")}
+          </motion.p>
+        </AnimatePresence>
+
+        {long && (
+          <button
+            onClick={() => setOpen(!open)}
+            className="
+              mt-3 inline-flex items-center gap-2 
+              text-sm text-[#00ADB5] font-semibold
+            "
+          >
+            {open ? (
+              <>
+                <ChevronUp className="w-4 h-4" /> Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" /> Read more
+              </>
+            )}
+          </button>
+        )}
+      </div>
+    </BaseCard>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* EXPERIENCE CARD – FULL JSON SUPPORT */
+/* -------------------------------------------------------------------------- */
+
+export function ExperienceCard({ experience }) {
+  const [open, setOpen] = useState(false);
+
+  const start = formatDate(experience.startDate);
+  const end = experience.endDate ? formatDate(experience.endDate) : "Present";
+
+  const tech =
+    typeof experience.technologies === "string"
+      ? experience.technologies.split(",").map((x) => x.trim())
+      : experience.technologies || [];
+
+  return (
+    <BaseCard
+      icon={<Briefcase className="w-6 h-6" />}
+      title={experience.position}
+      subtitle={`${experience.company} • ${start} — ${end}`}
+      accent="teal"
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="text-slate-600 dark:text-slate-400 mb-2 text-sm"
+      >
+        {open ? "Hide details" : "Show details"}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <p className="whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-300">
+              {experience.description}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {tech.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tech.map((t, i) => (
+            <span
+              key={i}
+              className="
+                px-3 py-1 rounded-full text-xs 
+                bg-blur border text-white    hover:bg-[#00ADB5]"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </BaseCard>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* HEADER TAG */
+/* -------------------------------------------------------------------------- */
+
+export function HeaderTag({ icon, title, subtitle }) {
+  return (
+    <div className="text-center mb-12">
+      <div
+        className="
+          inline-flex items-center gap-3 px-5 py-2.5 rounded-xl 
+          bg-blur hover:bg-[#393E46] shadow-sm hover:text-[#00ADB5] text-white
+        "
+      >
+        {icon}
+        <span className="text-sm font-semibold tracking-wide">
+          {subtitle}
+        </span>
+      </div>
+
+      <h2
+        className="
+          mt-5 text-4xl md:text-5xl font-serif font-bold 
+          tracking-tight text-white hover:text-[#00ADB5]
+        "
+      >
+        {title}
+      </h2>
+    </div>
+  );
 }

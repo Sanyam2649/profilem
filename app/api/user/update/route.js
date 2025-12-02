@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { updateUser } from '@/lib/user.js';
+import { authenticateRequest } from '@/lib/apiAuth.js';
 
 export async function PATCH(req) {
   try {
+    // Authenticate the request
+    const { error, user } = await authenticateRequest(req);
+    
+    if (error) {
+      return error;
+    }
+
     const formData = await req.formData();
-    const userId = formData.get("userId");
     const name = formData.get("name");
     const email = formData.get("email");
     const avatarFile = formData.get("avatar");
@@ -16,7 +23,8 @@ export async function PATCH(req) {
       updatePayload.avatarFileName = avatarFile.name;
     }
 
-    const updatedUser = await updateUser(userId, updatePayload);
+    // Use authenticated user's ID
+    const updatedUser = await updateUser(user._id.toString(), updatePayload);
 
     return NextResponse.json({ user: updatedUser }, { status: 200 });
   } catch (error) {

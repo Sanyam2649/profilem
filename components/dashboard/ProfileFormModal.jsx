@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { X, Loader2, Trash2, Plus, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Loader2, Trash2, Plus, ChevronDown, ChevronUp, GripVertical, AlertTriangle } from 'lucide-react';
 
 const initialPersonalInfo = {
   name: '',
@@ -42,8 +42,8 @@ const initialExperience = {
   location: '',
   startDate: '',
   endDate: '',
-  responsibilities: [],
-  technologies: [],
+  description: '',
+  technologies: '',
   isCurrent: false,
 };
 
@@ -59,16 +59,15 @@ const initialProject = {
   description: '',
   link: '',
   github: '',
-  technologies: [],
+  technologies: '',
   startDate: '',
   endDate: '',
   isCurrent: false,
 };
 
 const initialSkill = {
-  name: '',
-  level: 'intermediate',
-  category: '',
+  header: '',
+  skills: '',
 };
 
 // Simple custom field structure for frontend
@@ -86,9 +85,6 @@ const ProfileFormModal = ({
   onSave,
 }) => {
   const [formData, setFormData] = useState(initialFormState);
-  const [newCertification, setNewCertification] = useState('');
-  const [newResponsibility, setNewResponsibility] = useState('');
-  const [newTechnology, setNewTechnology] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [draggedSection, setDraggedSection] = useState(null);
   const [sectionOrder, setSectionOrder] = useState([
@@ -109,6 +105,39 @@ const ProfileFormModal = ({
     certification: false,
     customSections: false,
   });
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const hasChangesRef = useRef(false);
+
+  // Track if form has changes
+  useEffect(() => {
+    if (isOpen) {
+      hasChangesRef.current = true;
+    }
+  }, [formData, isOpen]);
+
+  // Prevent page navigation/close when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isOpen]);
+
+  const handleCloseRequest = useCallback(() => {
+    setShowCloseConfirm(true);
+  }, []);
+
+  const confirmClose = useCallback(() => {
+    setShowCloseConfirm(false);
+    hasChangesRef.current = false;
+    onClose();
+  }, [onClose]);
 
   // Helper function to convert customSections to simple custom fields for frontend
   const customSectionsToFields = (customSections) => {
@@ -169,6 +198,60 @@ const ProfileFormModal = ({
     return typeMap[schemaType] || 'text';
   };
 
+  // Convert skills from old format (name, level, category) to new format (header, skills)
+  const convertSkillsToNewFormat = (skills) => {
+    if (!skills || !Array.isArray(skills)) return [];
+    
+    // Check if skills are already in new format
+    const isNewFormat = skills.some(s => s.header !== undefined || s.skills !== undefined);
+    
+    if (isNewFormat) {
+      // Already in new format, just ensure structure is correct
+      return skills.map(skill => ({
+        header: skill.header || '',
+        skills: skill.skills || '',
+      }));
+    }
+    
+    // Old format: group skills by category/header
+    const grouped = {};
+    skills.forEach(skill => {
+      if (!skill || typeof skill !== 'object') return;
+      
+      const header = skill.category || skill.header || 'Other';
+      if (!grouped[header]) {
+        grouped[header] = [];
+      }
+      
+      if (skill.name) {
+        // Old format: add name to the group
+        grouped[header].push(skill.name);
+      }
+    });
+    
+    // Convert grouped object to array of {header, skills}
+    return Object.entries(grouped).map(([header, skillNames]) => ({
+      header,
+      skills: skillNames.join(', ')
+    }));
+  };
+
+  // Convert technologies from array to string
+  const convertTechnologiesToString = (tech) => {
+    if (!tech) return '';
+    if (typeof tech === 'string') return tech;
+    if (Array.isArray(tech)) return tech.join(', ');
+    return '';
+  };
+
+  // Convert technologies from string to array (for backward compatibility if needed)
+  const convertTechnologiesToArray = (tech) => {
+    if (!tech) return [];
+    if (Array.isArray(tech)) return tech;
+    if (typeof tech === 'string') return tech.split(',').map(t => t.trim()).filter(t => t);
+    return [];
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -219,6 +302,9 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
       //   customSections: customFields,
       // });
       
+      // Convert skills to new format
+      const convertedSkills = convertSkillsToNewFormat(editingData.skills || []);
+      
       setFormData({
   ...initialFormState,
   ...editingData,
@@ -233,13 +319,22 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
     startDate: toInputDate(e.startDate),
     endDate: toInputDate(e.endDate),
     isCurrent: !e.endDate,
+    // Convert technologies array to string, or keep as string
+    technologies: convertTechnologiesToString(e.technologies),
+    // Convert responsibilities array to description if description doesn't exist
+    description: e.description || (e.responsibilities && Array.isArray(e.responsibilities) 
+      ? e.responsibilities.join('\n• ') 
+      : ''),
   })),
   projects: (editingData.projects || []).map(p => ({
     ...p,
     startDate: toInputDate(p.startDate),
     endDate: toInputDate(p.endDate),
     isCurrent: !p.endDate,
+    // Convert technologies array to string, or keep as string
+    technologies: convertTechnologiesToString(p.technologies),
   })),
+  skills: convertedSkills,
   customSections: customFields,
 });
 
@@ -247,9 +342,6 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
       setSectionOrder(fixedOrder);
 
       // Reset temp inputs
-      setNewCertification("");
-      setNewResponsibility("");
-      setNewTechnology("");
     }, 0);
 
     return () => clearTimeout(timeout);
@@ -260,14 +352,48 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
     e.preventDefault();
     setIsSaving(true);
     try {
+      // Ensure technologies are strings (not arrays) for experience and projects
+      const processedExperience = (formData.experience || []).map(exp => {
+        const { isCurrent, responsibilities, ...rest } = exp;
+        return {
+          ...rest,
+          technologies: convertTechnologiesToString(exp.technologies),
+          // Remove responsibilities if it exists (we use description now)
+        };
+      });
+
+      const processedProjects = (formData.projects || []).map(proj => {
+        const { isCurrent, ...rest } = proj;
+        return {
+          ...rest,
+          technologies: convertTechnologiesToString(proj.technologies),
+        };
+      });
+
+      // Ensure skills are in correct format
+      const processedSkills = (formData.skills || []).map(skill => ({
+        header: skill.header || '',
+        skills: skill.skills || '',
+      }));
+
+      // Process education - remove isCurrent field
+      const processedEducation = (formData.education || []).map(edu => {
+        const { isCurrent, ...rest } = edu;
+        return rest;
+      });
+
       // Convert simple fields back to customSections structure for saving
       const saveData = {
         ...formData,
+        education: processedEducation,
+        experience: processedExperience,
+        projects: processedProjects,
+        skills: processedSkills,
         sectionOrder,
         customSections: fieldsToCustomSections(formData.customSections),
       };
 
-      console.log('Saving data with customSections:', saveData.customSections);
+      console.log('Saving data:', saveData);
       await onSave(saveData);
       onClose();
     } catch (err) {
@@ -412,7 +538,7 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
           </h2>
           <div className="flex items-center gap-2">
             <button
-              onClick={onClose}
+              onClick={handleCloseRequest}
               className="btn btn-circle btn-ghost btn-sm hover:bg-base-300 transition-colors"
               type="button"
             >
@@ -420,6 +546,39 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
             </button>
           </div>
         </div>
+
+        {/* Close Confirmation Dialog */}
+        {showCloseConfirm && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+            <div className="bg-base-100 p-6 rounded-xl shadow-2xl max-w-md mx-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-full bg-amber-100">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="font-bold text-lg text-base-content">Discard Changes?</h3>
+              </div>
+              <p className="text-base-content/70 mb-6">
+                You have unsaved changes. Are you sure you want to close without saving?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="btn btn-ghost flex-1"
+                  onClick={() => setShowCloseConfirm(false)}
+                >
+                  Keep Editing
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-error flex-1"
+                  onClick={confirmClose}
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className='grid grid-cols-1 gap-6'>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -548,30 +707,17 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, 'education')}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('education')}
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
-                          <h3 className="text-lg font-semibold text-base-content">Education</h3>
-                        </div>
-                        {expandedSections.education ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          formData.education.length > 0 &&
-                          isObjectEmpty(formData.education[formData.education.length - 1])
-                        }
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() => addItem('education', { ...initialEducation })}
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('education')}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
+                        <h3 className="text-lg font-semibold text-base-content">Education</h3>
+                      </div>
+                      {expandedSections.education ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </button>
 
                     {expandedSections.education && (
                       <div className="mt-4 space-y-4">
@@ -687,6 +833,19 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No education entries added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          disabled={
+                            formData.education.length > 0 &&
+                            isObjectEmpty(formData.education[formData.education.length - 1])
+                          }
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() => addItem('education', { ...initialEducation })}
+                        >
+                          <Plus className="w-4 h-4" /> Add Education
+                        </button>
                       </div>
                     )}
                   </section>
@@ -703,30 +862,17 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, 'experience')}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('experience')}
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
-                          <h3 className="text-lg font-semibold text-base-content">Work Experience</h3>
-                        </div>
-                        {expandedSections.experience ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          formData.experience.length > 0 &&
-                          isObjectEmpty(formData.experience[formData.experience.length - 1])
-                        }
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() => addItem('experience', { ...initialExperience })}
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('experience')}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
+                        <h3 className="text-lg font-semibold text-base-content">Work Experience</h3>
+                      </div>
+                      {expandedSections.experience ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </button>
 
                     {expandedSections.experience && (
                       <div className="mt-4 space-y-4">
@@ -804,96 +950,35 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                               </div>
                             </div>
 
-                            {/* Responsibilities */}
+                            {/* Job Description */}
                             <div className="mt-4 space-y-2">
                               <label className="label">
-                                <span className="label-text font-medium">Responsibilities</span>
+                                <span className="label-text font-medium">Job Description</span>
                               </label>
-                              <div className="flex gap-2 mb-2">
-                                <input
-                                  placeholder="Add responsibility"
-                                  value={newResponsibility}
-                                  onChange={(e) => setNewResponsibility(e.target.value)}
-                                  className="input input-bordered flex-1"
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      e.preventDefault();
-                                      addArrayItem('experience', idx, 'responsibilities', newResponsibility);
-                                      setNewResponsibility('');
-                                    }
-                                  }}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    addArrayItem('experience', idx, 'responsibilities', newResponsibility);
-                                    setNewResponsibility('');
-                                  }}
-                                  className="btn btn-sm btn-primary"
-                                >
-                                  Add
-                                </button>
-                              </div>
-                              <div className="space-y-1">
-                                {exp.responsibilities?.map((resp, respIdx) => (
-                                  <div key={respIdx} className="flex items-center gap-2 bg-base-200 px-3 py-2 rounded">
-                                    <span className="flex-1">{resp}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeArrayItem('experience', idx, 'responsibilities', respIdx)}
-                                      className="btn btn-ghost btn-xs text-error"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
+                              <textarea
+                                placeholder="Describe your role, responsibilities, and achievements..."
+                                value={exp.description || ''}
+                                onChange={(e) => updateNestedItem('experience', idx, 'description', e.target.value)}
+                                className="textarea textarea-bordered w-full"
+                                rows={4}
+                              />
                             </div>
 
                             {/* Technologies */}
                             <div className="mt-4 space-y-2">
                               <label className="label">
-                                <span className="label-text font-medium">Technologies Used</span>
+                                <span className="label-text font-medium">Technologies Used (comma-separated)</span>
                               </label>
-                              <div className="flex gap-2 mb-2">
-                                <input
-                                  placeholder="Add technology"
-                                  value={newTechnology}
-                                  onChange={(e) => setNewTechnology(e.target.value)}
-                                  className="input input-bordered flex-1"
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      e.preventDefault();
-                                      addArrayItem('experience', idx, 'technologies', newTechnology);
-                                      setNewTechnology('');
-                                    }
-                                  }}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    addArrayItem('experience', idx, 'technologies', newTechnology);
-                                    setNewTechnology('');
-                                  }}
-                                  className="btn btn-sm btn-primary"
-                                >
-                                  Add
-                                </button>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {exp.technologies?.map((tech, techIdx) => (
-                                  <div key={techIdx} className="badge badge-primary gap-1">
-                                    {tech}
-                                    <button
-                                      type="button"
-                                      onClick={() => removeArrayItem('experience', idx, 'technologies', techIdx)}
-                                      className="text-xs hover:text-error"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
+                              <textarea
+                                placeholder="React, Node.js, MongoDB, TypeScript"
+                                value={exp.technologies || ''}
+                                onChange={(e) => updateNestedItem('experience', idx, 'technologies', e.target.value)}
+                                className="textarea textarea-bordered w-full"
+                                rows={2}
+                              />
+                              <p className="text-xs text-base-content/60">
+                                Enter technologies separated by commas. Example: React, Node.js, MongoDB
+                              </p>
                             </div>
 
                             <div className="flex justify-end mt-3 pt-3 border-t border-base-300">
@@ -912,6 +997,19 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No work experience added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          disabled={
+                            formData.experience.length > 0 &&
+                            isObjectEmpty(formData.experience[formData.experience.length - 1])
+                          }
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() => addItem('experience', { ...initialExperience })}
+                        >
+                          <Plus className="w-4 h-4" /> Add Experience
+                        </button>
                       </div>
                     )}
                   </section>
@@ -928,30 +1026,17 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, 'projects')}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('projects')}
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
-                          <h3 className="text-lg font-semibold text-base-content">Projects</h3>
-                        </div>
-                        {expandedSections.projects ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          formData.projects.length > 0 &&
-                          isObjectEmpty(formData.projects[formData.projects.length - 1])
-                        }
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() => addItem('projects', { ...initialProject })}
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('projects')}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
+                        <h3 className="text-lg font-semibold text-base-content">Projects</h3>
+                      </div>
+                      {expandedSections.projects ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </button>
 
                     {expandedSections.projects && (
                       <div className="mt-4 space-y-4">
@@ -1044,47 +1129,18 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             {/* Technologies */}
                             <div className="mt-4 space-y-2">
                               <label className="label">
-                                <span className="label-text font-medium">Technologies Used</span>
+                                <span className="label-text font-medium">Technologies Used (comma-separated)</span>
                               </label>
-                              <div className="flex gap-2 mb-2">
-                                <input
-                                  placeholder="Add technology"
-                                  value={newTechnology}
-                                  onChange={(e) => setNewTechnology(e.target.value)}
-                                  className="input input-bordered flex-1"
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      e.preventDefault();
-                                      addArrayItem('projects', idx, 'technologies', newTechnology);
-                                      setNewTechnology('');
-                                    }
-                                  }}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    addArrayItem('projects', idx, 'technologies', newTechnology);
-                                    setNewTechnology('');
-                                  }}
-                                  className="btn btn-sm btn-primary"
-                                >
-                                  Add
-                                </button>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {project.technologies?.map((tech, techIdx) => (
-                                  <div key={techIdx} className="badge badge-secondary gap-1">
-                                    {tech}
-                                    <button
-                                      type="button"
-                                      onClick={() => removeArrayItem('projects', idx, 'technologies', techIdx)}
-                                      className="text-xs hover:text-error"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
+                              <textarea
+                                placeholder="React, Node.js, MongoDB, TypeScript"
+                                value={project.technologies || ''}
+                                onChange={(e) => updateNestedItem('projects', idx, 'technologies', e.target.value)}
+                                className="textarea textarea-bordered w-full"
+                                rows={2}
+                              />
+                              <p className="text-xs text-base-content/60">
+                                Enter technologies separated by commas. Example: React, Node.js, MongoDB
+                              </p>
                             </div>
 
                             <div className="flex justify-end mt-3 pt-3 border-t border-base-300">
@@ -1103,6 +1159,19 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No projects added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          disabled={
+                            formData.projects.length > 0 &&
+                            isObjectEmpty(formData.projects[formData.projects.length - 1])
+                          }
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() => addItem('projects', { ...initialProject })}
+                        >
+                          <Plus className="w-4 h-4" /> Add Project
+                        </button>
                       </div>
                     )}
                   </section>
@@ -1119,72 +1188,48 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, 'skills')}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('skills')}
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
-                          <h3 className="text-lg font-semibold text-base-content">Skills</h3>
-                        </div>
-                        {expandedSections.skills ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          formData.skills.length > 0 &&
-                          isObjectEmpty(formData.skills[formData.skills.length - 1])
-                        }
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() => addItem('skills', { ...initialSkill })}
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('skills')}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
+                        <h3 className="text-lg font-semibold text-base-content">Skills</h3>
+                      </div>
+                      {expandedSections.skills ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </button>
 
                     {expandedSections.skills && (
                       <div className="mt-4 space-y-4">
                         {formData.skills?.map((skill, idx) => (
                           <div key={idx} className="card bg-base-100 p-4 border border-base-300">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 gap-3">
                               <div className="space-y-2">
                                 <label className="label">
-                                  <span className="label-text font-medium">Skill Name</span>
+                                  <span className="label-text font-medium">Skill Header</span>
                                 </label>
                                 <input
-                                  placeholder="JavaScript, React, etc."
-                                  value={skill.name}
-                                  onChange={(e) => updateNestedItem('skills', idx, 'name', e.target.value)}
+                                  placeholder="Frontend, Backend, DevOps, etc."
+                                  value={skill.header || ''}
+                                  onChange={(e) => updateNestedItem('skills', idx, 'header', e.target.value)}
                                   className="input input-bordered w-full"
                                 />
                               </div>
                               <div className="space-y-2">
                                 <label className="label">
-                                  <span className="label-text font-medium">Category</span>
+                                  <span className="label-text font-medium">Skills (comma-separated)</span>
                                 </label>
-                                <input
-                                  placeholder="Frontend, Backend, etc."
-                                  value={skill.category || ''}
-                                  onChange={(e) => updateNestedItem('skills', idx, 'category', e.target.value)}
-                                  className="input input-bordered w-full"
+                                <textarea
+                                  placeholder="JavaScript, React, Node.js, TypeScript"
+                                  value={skill.skills || ''}
+                                  onChange={(e) => updateNestedItem('skills', idx, 'skills', e.target.value)}
+                                  className="textarea textarea-bordered w-full"
+                                  rows={2}
                                 />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="label">
-                                  <span className="label-text font-medium">Proficiency Level</span>
-                                </label>
-                                <select
-                                  value={skill.level || 'intermediate'}
-                                  onChange={(e) => updateNestedItem('skills', idx, 'level', e.target.value)}
-                                  className="select select-bordered w-full"
-                                >
-                                  <option value="beginner">Beginner</option>
-                                  <option value="intermediate">Intermediate</option>
-                                  <option value="advanced">Advanced</option>
-                                  <option value="expert">Expert</option>
-                                </select>
+                                <p className="text-xs text-base-content/60">
+                                  Enter skills separated by commas. Example: JavaScript, React, Node.js
+                                </p>
                               </div>
                             </div>
                             <div className="flex justify-end mt-3 pt-3 border-t border-base-300">
@@ -1203,6 +1248,19 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No skills added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          disabled={
+                            formData.skills.length > 0 &&
+                            isObjectEmpty(formData.skills[formData.skills.length - 1])
+                          }
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() => addItem('skills', { ...initialSkill })}
+                        >
+                          <Plus className="w-4 h-4" /> Add Skill Category
+                        </button>
                       </div>
                     )}
                   </section>
@@ -1219,30 +1277,17 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, 'certification')}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('certification')}
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
-                          <h3 className="text-lg font-semibold text-base-content">Certifications</h3>
-                        </div>
-                        {expandedSections.certification ? <ChevronUp /> : <ChevronDown />}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          formData.certification.length > 0 &&
-                          isObjectEmpty(formData.certification[formData.certification.length - 1])
-                        }
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() => addItem('certification', { ...initialCertification })}
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('certification')}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab active:cursor-grabbing" />
+                        <h3 className="text-lg font-semibold text-base-content">Certifications</h3>
+                      </div>
+                      {expandedSections.certification ? <ChevronUp /> : <ChevronDown />}
+                    </button>
 
                     {expandedSections.certification && (
                       <div className="mt-4 space-y-4">
@@ -1309,6 +1354,19 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No certifications added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          disabled={
+                            formData.certification.length > 0 &&
+                            isObjectEmpty(formData.certification[formData.certification.length - 1])
+                          }
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() => addItem('certification', { ...initialCertification })}
+                        >
+                          <Plus className="w-4 h-4" /> Add Certification
+                        </button>
                       </div>
                     )}
                   </section>
@@ -1325,43 +1383,26 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                     onDragOver={handleSectionDragOver}
                     onDrop={(e) => handleSectionDrop(e, "customSections")}
                   >
-                    <div className="flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          toggleSection("customSections")
-                        }
-                        className="flex items-center justify-between w-full text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab" />
-                          <h3 className="text-lg font-semibold text-base-content">
-                            Custom Sections
-                          </h3>
-                        </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleSection("customSections")
+                      }
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-base-content/50 cursor-grab" />
+                        <h3 className="text-lg font-semibold text-base-content">
+                          Custom Sections
+                        </h3>
+                      </div>
 
-                        {expandedSections.customSections ? (
-                          <ChevronUp className="w-5 h-5" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5" />
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm ml-4"
-                        onClick={() =>
-                          addItem("customSections", {
-                            fieldName: "",
-                            fieldType: "text",
-                            fieldValue: "",
-                            fieldOptions: [],
-                          })
-                        }
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
+                      {expandedSections.customSections ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </button>
 
                     {expandedSections.customSections && (
                       <div className="mt-4 space-y-4">
@@ -1505,6 +1546,22 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
                             No custom sections added yet.
                           </div>
                         )}
+                        
+                        {/* Add Button at Bottom */}
+                        <button
+                          type="button"
+                          className="btn btn-primary w-full mt-4"
+                          onClick={() =>
+                            addItem("customSections", {
+                              fieldName: "",
+                              fieldType: "text",
+                              fieldValue: "",
+                              fieldOptions: [],
+                            })
+                          }
+                        >
+                          <Plus className="w-4 h-4" /> Add Custom Section
+                        </button>
                       </div>
                     )}
                   </section>
@@ -1517,7 +1574,7 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
             <div className="flex justify-end gap-3 pt-6 border-t border-base-300">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleCloseRequest}
                 className="btn btn-ghost"
                 disabled={isSaving}
               >

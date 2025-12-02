@@ -69,18 +69,26 @@ const Home = () => {
               {/* Welcome Block */}
               <div className="text-center mb-2 sm:mb-4">
                 <div className="relative inline-block mb-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white shadow-lg mx-auto overflow-hidden">
-                    {/* <img
-                      src={user?.avatar}
-                      alt={user?.name}
-                      className="w-full h-full object-cover"
-                    /> */}
-                     <Image
-                          src={user?.avatar?.url}
-                          alt="avatar"
-                          width={40}
-                          height={40}
-                          className="w-full h-full object-cover"/>
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white shadow-lg mx-auto overflow-hidden bg-slate-200">
+                    {(() => {
+                      const avatarUrl = user?.avatar?.url || user?.avatar;
+                      if (avatarUrl && avatarUrl.trim() !== '') {
+                        return (
+                          <Image
+                            src={avatarUrl}
+                            alt={user?.name || 'avatar'}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        );
+                      }
+                      return (
+                        <div className="flex items-center justify-center w-full h-full text-slate-500 text-lg font-semibold">
+                          {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white"></div>
                 </div>

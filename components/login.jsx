@@ -4,6 +4,7 @@
 import { useState} from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
   const router = useRouter();
@@ -11,6 +12,8 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+   const [showPassword, setShowPassword] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +37,11 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
 
       if (!response.ok) throw new Error(data.error || 'Login failed');
 
-      login(data.user);
+      // Login with user data and tokens
+      login(data.user, {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
       onSuccess?.();
       onClose?.();
       router.push('/dashboard');
@@ -68,15 +75,24 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
         />
 
         <label className="label text-slate-700">Password</label>
-        <input
-          type="password"
-          name="password"
-          className="input input-bordered w-full text-black bg-white border-slate-300 focus:border-blue-500"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            className="input input-bordered bg-white border-slate-300 text-black w-full pr-14"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <button
+            type="button"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            onClick={() => setShowPassword(s => !s)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 z-20 w-8 h-8 flex items-center justify-center"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
         <button
           type="submit"

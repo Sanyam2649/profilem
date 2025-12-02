@@ -3,6 +3,7 @@
 import {useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { 
   FileText, 
   TrendingUp, 
@@ -17,7 +18,7 @@ import ProfileFormModal from '@/components/dashboard/ProfileFormModal';
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, authenticatedFetch } = useUser();
   const [profiles, setProfiles] = useState([]);
   const [filteredProfiles, setFilteredProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,10 +51,9 @@ const Dashboard = () => {
     
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/user/profiles`, {
+      const response = await authenticatedFetch(`/api/user/profiles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id }),
       });
       
       if (!response.ok) {
@@ -101,7 +101,7 @@ const Dashboard = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, authenticatedFetch]);
 
   useEffect(() => {
     if (!isCheckingAuth && user) {
@@ -149,27 +149,23 @@ const Dashboard = () => {
       let response;
       
       if (editingProfile) {
-        response = await fetch('/api/profile/update', {
+        response = await authenticatedFetch('/api/profile/update', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             profileId: editingProfile._id,
-            userId: user._id,
             updates: profileData
           }),
         });
       } else {
-        response = await fetch('/api/profile/create', {
+        response = await authenticatedFetch('/api/profile/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            userId: user._id,
-            ...profileData
-          }),
+          body: JSON.stringify(profileData),
         });
       }
 
@@ -188,17 +184,17 @@ const Dashboard = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    console.log('Closing modal');
+const handleCloseModal = () => {
     setIsFormModalOpen(false);
     setEditingProfile(null);
-  };
+
+};
 
   const handleDeleteProfile = async (profileId) => {
     if (!confirm('Are you sure you want to delete this profile? This action cannot be undone.')) return;
 
     try {
-      const response = await fetch(`/api/profile/delete`, {
+      const response = await authenticatedFetch(`/api/profile/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profileId }),
@@ -215,18 +211,38 @@ const Dashboard = () => {
     }
   };
 
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 to-blue-50">
-        <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-blue-600 mb-4"></div>
-          <p className="text-slate-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
+useEffect(() => {
+  if (!isFormModalOpen) return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // Required for Chrome
+    return "";
+  };
+
+  const handleRouteChangeStart = (url) => {
+    if (!confirm("You have unsaved changes. Do you really want to leave?")) {
+      // Cancel route change
+      router.push(router.asPath);
+      throw "Route Change Aborted";
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener("popstate", handleRouteChangeStart);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+    window.removeEventListener("popstate", handleRouteChangeStart);
+  };
+}, [isFormModalOpen, router]);
+
+
+
+
 
 return (
+  <ProtectedRoute>
   <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50">
 
     {/* Header */}
@@ -252,7 +268,7 @@ return (
           {/* Create Profile Button */}
           <button
             onClick={handleCreateProfile}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl text-base sm:text-lg shadow-md hover:shadow-lg
+            className="w-full sm:w-auto  text-base sm:text-lg 
  bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5" /> Create New Profile
@@ -368,6 +384,7 @@ return (
       isSaving={isSaving}
     />
   </div>
+  </ProtectedRoute>
 );
 
 };

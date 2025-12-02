@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getProfilesByUser } from '@/lib/profile.js';
+import { authenticateRequest } from '@/lib/apiAuth.js';
 
 export async function POST(req) {
   try {
-    const { userId } = await req.json();
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    // Authenticate the request
+    const { error, user } = await authenticateRequest(req);
+    
+    if (error) {
+      return error;
     }
 
-    const profiles = await getProfilesByUser(userId);
-    return NextResponse.json({ profiles });
+    // Use authenticated user's ID instead of request body
+    const profiles = await getProfilesByUser(user._id.toString());
+    return NextResponse.json({ profile: profiles, profiles });
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error }, { status: 500 });

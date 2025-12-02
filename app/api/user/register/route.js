@@ -1,5 +1,6 @@
 import { registerUser } from '@/lib/user';
 import { NextResponse } from 'next/server';
+import { generateAccessToken, generateRefreshToken, saveRefreshToken } from '@/lib/auth.js';
 
 export async function POST(req) {
   try {
@@ -43,15 +44,24 @@ export async function POST(req) {
       avatarFileName,
     });
 
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id.toString());
+    const refreshToken = generateRefreshToken(user._id.toString());
+    
+    // Save refresh token to database
+    await saveRefreshToken(user._id.toString(), refreshToken);
+
     return NextResponse.json(
       {
         message: 'User registered successfully',
         user: {
-          id: user._id,
+          _id: user._id.toString(),
           name: user.name,
           email: user.email,
-          avatar: user.avatar?.url || null,
+          avatar: user.avatar?.url || user.avatar,
         },
+        accessToken,
+        refreshToken,
       },
       { status: 201 }
     );

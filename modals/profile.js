@@ -23,8 +23,8 @@ const ExperienceSchema = new Schema(
         location: { type: String },
         startDate: { type: Date },
         endDate: { type: Date },
-        responsibilities: [{ type: String }],
-        technologies: [{ type: String }],
+        description: { type: String },
+        technologies: { type: String }, // Comma-separated technologies string
         order: { type: Number, default: 0 }
     },
     { _id: true }
@@ -37,7 +37,7 @@ const ProjectSchema = new Schema(
         description: { type: String },
         link: { type: String },
         github: { type: String },
-        technologies: [{ type: String }],
+        technologies: { type: String }, // Comma-separated technologies string
         startDate: { type: Date },
         endDate: { type: Date },
         order: { type: Number, default: 0 }
@@ -48,12 +48,8 @@ const ProjectSchema = new Schema(
 // ---- Skill Schema ----
 const SkillSchema = new Schema(
     {
-        name: { type: String },
-        level: {
-            type: String,
-            enum: ['beginner', 'intermediate', 'advanced', 'expert'],
-        },
-        category: { type: String },
+        header: { type: String },
+        skills: { type: String }, // Comma-separated skills string
         order: { type: Number, default: 0 }
     },
     { _id: true }
