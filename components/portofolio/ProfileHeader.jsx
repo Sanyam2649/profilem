@@ -13,7 +13,7 @@ const ProfileHeader = ({ profile }) => {
 
   return (
     <div className="flex flex-col">
-     <section className="relative w-full min-h-[90vh] flex items-center py-20 md:py-28 overflow-hidden">
+     <section  id="home" className="relative w-full min-h-[90vh] flex items-center py-20 md:py-28 overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
@@ -104,33 +104,68 @@ const ProfileHeader = ({ profile }) => {
 
           {/* Right Image Section */}
           <div className="relative shrink-0 hidden lg:flex">
-            <div className="relative w-[500px] h-[500px]">
-              {/* Background decorative frame */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-[3rem] rotate-6 opacity-80"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-indigo-200 to-purple-200 rounded-[2.8rem] -rotate-3 opacity-60"></div>
-              
-              {/* Images */}
-              <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <Image 
-                  src={Background} 
-                  alt="Background" 
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <Image 
-                  src={person} 
-                  alt={profile.name} 
-                  fill
-                  className="object-contain object-center scale-90"
-                  priority
-                />
-              </div>
-              
-              {/* Floating elements */}
-              <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-xl"></div>
-            </div>
+           { profile?.avatar?.url ? <PortfolioImage profile={profile?.avatar?.url}/>
+           : 
+           <div className="relative w-[500px] h-[500px] group">
+  {/* Animated background layer 1 */}
+  <div 
+    className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-[3rem] rotate-6 opacity-80 transition-all duration-700 ease-out group-hover:rotate-12 group-hover:scale-105"
+    style={{
+      animation: 'float 6s ease-in-out infinite'
+    }}
+  ></div>
+  
+  {/* Animated background layer 2 */}
+  <div 
+    className="absolute inset-0 bg-gradient-to-br from-blue-200 via-indigo-200 to-purple-200 rounded-[2.8rem] -rotate-3 opacity-60 transition-all duration-700 ease-out group-hover:-rotate-6 group-hover:scale-105"
+    style={{
+      animation: 'float 6s ease-in-out infinite 1s'
+    }}
+  ></div>
+  
+  {/* Main image container */}
+  <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500 group-hover:shadow-indigo-500/50 group-hover:shadow-3xl">
+    {/* Shimmer effect */}
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 z-10"></div>
+    
+    <Image 
+      src={Background} 
+      alt="Background" 
+      fill
+      className="object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+      priority
+    />
+    <Image 
+      src={person} 
+      alt={profile.name} 
+      fill
+      className="object-contain object-center scale-90 transition-all duration-700 group-hover:scale-95 z-10"
+      priority
+    />
+    
+    {/* Gradient overlay on hover */}
+    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+  </div>
+  
+  {/* Animated blur orb top-left */}
+  <div 
+    className="absolute -top-6 -left-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl transition-all duration-500 group-hover:w-32 group-hover:h-32 group-hover:bg-blue-500/20 group-hover:-top-8 group-hover:-left-8"
+    style={{
+      animation: 'pulse-slow 4s ease-in-out infinite'
+    }}
+  ></div>
+  
+  {/* Animated blur orb bottom-right */}
+  <div 
+    className="absolute -bottom-6 -right-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-xl transition-all duration-500 group-hover:w-40 group-hover:h-40 group-hover:bg-indigo-500/20 group-hover:-bottom-8 group-hover:-right-8"
+    style={{
+      animation: 'pulse-slow 4s ease-in-out infinite 2s'
+    }}
+  ></div>
+</div>
+
+            }
+        
           </div>
         </div>
       </div>
@@ -198,3 +233,97 @@ const CommonAnchorTag = ({ tag, title, icon }) => {
     </a>
   );
 };
+
+
+import React, { useState, useEffect } from 'react';
+
+function PortfolioImage({profile}) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      const x = (clientX / innerWidth - 0.5) * 20;
+      const y = (clientY / innerHeight - 0.5) * 20;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-8 overflow-hidden relative">
+      {/* Animated background orbs */}
+      {/* <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div> */}
+
+      {/* Main content */}
+      <div className="relative z-10">
+        <div 
+          className="relative group"
+          style={{
+            transform: `perspective(1000px) rotateX(${-mousePosition.y}deg) rotateY(${mousePosition.x}deg)`
+          }}
+        >
+          {/* Glowing ring */}
+          <div className="absolute inset-0 -m-4">
+            <div className="w-full h-full rounded-full border-2 border-purple-500/30 animate-spin-slow"></div>
+          </div>
+          <div className="absolute inset-0 -m-8">
+            <div className="w-full h-full rounded-full border-2 border-blue-500/20" style={{animation: 'spin 20s linear infinite reverse'}}></div>
+          </div>
+
+          {/* Image container */}
+          <div className="relative w-[500px] h-[500px] rounded-full overflow-hidden">
+            {/* Shimmer effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            {/* Loading state */}
+            {!isLoaded && (
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-purple-900 to-slate-800 animate-pulse"></div>
+            )}
+            
+            {/* Main image */}
+            <Image 
+              src={profile}
+              alt="Portfolio"
+              onLoad={() => setIsLoaded(true)}
+              fill
+              className={`w-full h-full object-cover transition-all duration-1000
+                ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}
+                group-hover:scale-110`}
+              style={{
+                filter: 'brightness(1.1) contrast(1.1)',
+              }}
+            />
+            
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {/* Inner glow */}
+            <div className="absolute inset-0 rounded-full shadow-inner shadow-purple-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+
+          {/* Outer glow effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-500 -z-10"></div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 30s linear infinite;
+        }
+      `}</style>
+    </div>
+  );
+}

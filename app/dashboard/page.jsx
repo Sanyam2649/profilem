@@ -141,48 +141,52 @@ const Dashboard = () => {
     setIsFormModalOpen(true);
   };
 
-  const handleSaveProfile = async (profileData) => {
-    if (!user) return;
+ const handleSaveProfile = async (profileData) => {
+  if (!user) return;
 
-    setIsSaving(true);
-    try {
-      let response;
-      
-      if (editingProfile) {
-        response = await authenticatedFetch('/api/profile/update', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            profileId: editingProfile._id,
-            updates: profileData
-          }),
-        });
-      } else {
-        response = await authenticatedFetch('/api/profile/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(profileData),
-        });
-      }
+  setIsSaving(true);
+  try {
+    const formData = new FormData();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Failed to save profile: ${response.status}`);
-      }
+    // Extract avatarFile so it does NOT go inside JSON
+    const { avatarFile, ...cleanData } = profileData;
 
-      await fetchProfiles();
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      alert('Failed to save profile. Please try again.');
-      throw error;
-    } finally {
-      setIsSaving(false);
+    if (editingProfile) {
+      formData.append("profileId", editingProfile._id);
+      formData.append("updates", JSON.stringify(cleanData));
+    } else {
+      formData.append("data", JSON.stringify(cleanData));
     }
-  };
+
+    if (avatarFile) {
+      formData.append("avatar", avatarFile);
+    }
+
+    const endpoint = editingProfile
+      ? "/api/profile/update"
+      : "/api/profile/create";
+
+    const response = await authenticatedFetch(endpoint, {
+      method: editingProfile ? "PATCH" : "POST",
+      body: formData,
+      // NO CONTENT-TYPE HEADER HERE!
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to save profile");
+    }
+
+    await fetchProfiles();
+    setIsFormModalOpen(false);
+    setEditingProfile(null);
+
+  } catch (error) {
+    console.error("Error saving profile:", error);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
 const handleCloseModal = () => {
     setIsFormModalOpen(false);

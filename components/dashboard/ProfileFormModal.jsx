@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Loader2, Trash2, Plus, ChevronDown, ChevronUp, GripVertical, AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
 
 const initialPersonalInfo = {
   name: '',
@@ -106,6 +107,13 @@ const ProfileFormModal = ({
     customSections: false,
   });
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+const [avatarPreview, setAvatarPreview] = useState(null);
+const [avatarFile, setAvatarFile] = useState(null);
+const [avatarError, setAvatarError] = useState(null);
+const [uploadProgress, setUploadProgress] = useState(0);
+const [removeAvatar, setRemoveAvatar] = useState(false);
+
+
   const hasChangesRef = useRef(false);
 
   // Track if form has changes
@@ -157,6 +165,32 @@ const ProfileFormModal = ({
     });
   };
 
+  // === Avatar Change Handler (Validation + Preview) ===
+const handleAvatarChange = (file) => {
+  setAvatarError(null);
+
+  if (!file) return;
+
+  // Validation
+  if (!file.type.startsWith("image/")) {
+    setAvatarError("Please upload a valid image file.");
+    return;
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    setAvatarError("Image must be less than 3MB.");
+    return;
+  }
+
+  // Preview
+  const reader = new FileReader();
+  reader.onload = () => setAvatarPreview(reader.result);
+  reader.readAsDataURL(file);
+
+  setAvatarFile(file);
+};
+
+  
   // Helper function to convert simple custom fields to customSections for backend
   const fieldsToCustomSections = (customFields) => {
     if (!customFields || !Array.isArray(customFields)) return [];
@@ -384,14 +418,16 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
 
       // Convert simple fields back to customSections structure for saving
       const saveData = {
-        ...formData,
-        education: processedEducation,
-        experience: processedExperience,
-        projects: processedProjects,
-        skills: processedSkills,
-        sectionOrder,
-        customSections: fieldsToCustomSections(formData.customSections),
-      };
+  ...formData,
+  education: processedEducation,
+  experience: processedExperience,
+  projects: processedProjects,
+  skills: processedSkills,
+  sectionOrder,
+  customSections: fieldsToCustomSections(formData.customSections),
+  avatarFile: avatarFile || null,
+  removeAvatar
+};
 
       console.log('Saving data:', saveData);
       await onSave(saveData);
@@ -402,6 +438,11 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
       setIsSaving(false);
     }
   };
+  
+  const safeImageSrc = (value) => {
+  if (!value || value === "") return null;
+  return value;
+};
 
   // // Update all your existing functions to work with customSections instead of customFields
   // const updateField = (key, value) => {
@@ -607,7 +648,174 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
 
                     {expandedSections.personal && (
                       <div className="mt-4 space-y-4">
-                        {/* Name + Email */}
+                        
+                        <div className="flex flex-col gap-6">
+  <p className="label font-semibold text-lg">Profile Photo</p>
+
+  {/* Preview and Upload Section */}
+  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+    {/* Avatar Preview with Animation */}
+    <div className="relative group">
+      {/* Animated gradient ring */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-75 blur transition-opacity duration-500"></div>
+      
+      {/* Avatar container */}
+      <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-base-100 shadow-xl transition-transform duration-300 group-hover:scale-105">
+        <Image
+          src={
+            safeImageSrc(avatarPreview) ||
+            safeImageSrc(formData.personal?.avatar?.url) ||
+            "/default-avatar.png"
+          }
+          width={128}
+          height={128}
+          alt="Avatar Preview"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <svg 
+            className="w-8 h-8 text-white" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" 
+            />
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" 
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Upload badge */}
+      <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300">
+        <label className="cursor-pointer flex items-center justify-center w-full h-full">
+          <svg 
+            className="w-5 h-5 text-primary-content" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M12 4v16m8-8H4" 
+            />
+          </svg>
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => handleAvatarChange(e.target.files[0])}
+          />
+        </label>
+      </div>
+    </div>
+
+    {/* Upload Info and Actions */}
+    <div className="flex flex-col gap-3 flex-1 text-center sm:text-left">
+      <div>
+        <h4 className="font-medium text-base-content mb-1">
+          Upload your photo
+        </h4>
+        <p className="text-sm text-base-content/60">
+          JPG, PNG, WebP • Max 3MB
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2">
+        <label className="btn btn-primary btn-sm gap-2 flex-1 sm:flex-initial">
+          <svg 
+            className="w-4 h-4" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" 
+            />
+          </svg>
+          Choose File
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => handleAvatarChange(e.target.files[0])}
+          />
+        </label>
+
+        {(avatarPreview || formData.personal?.avatar?.url) && (
+          <button 
+            className="btn btn-ghost btn-sm gap-2 flex-1 sm:flex-initial"
+            onClick={() => {
+  setAvatarPreview(null);
+  setAvatarFile(null);
+  setRemoveAvatar(true);
+
+  // Clear existing avatar from form data UI
+  setFormData(prev => ({
+    ...prev,
+    personal: {
+      ...prev.personal,
+      avatar: null
+    }
+  }));
+}}
+
+          >
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+              />
+            </svg>
+            Remove
+          </button>
+        )}
+      </div>
+
+      {avatarError && (
+        <div className="alert alert-error py-2 px-3 text-sm">
+          <svg 
+            className="w-4 h-4" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+            />
+          </svg>
+          <span>{avatarError}</span>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="label">Full Name</label>
@@ -1569,6 +1777,21 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
               }
               return null;
             })}
+            {/* === Upload Progress === */}
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="mb-4">
+                <div className="w-full bg-base-300 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-primary h-2 transition-all"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs mt-1 text-base-content/60">
+                  Uploading... {uploadProgress}%
+                </p>
+              </div>
+            )}
+
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-6 border-t border-base-300">

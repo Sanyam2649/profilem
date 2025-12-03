@@ -60,7 +60,7 @@ const Bio = ({ Bio }) => {
           
           {/* Person Image - Overlapping */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-4/5 md:w-3/4 h-4/5">
+            {/* <div className="relative w-4/5 md:w-3/4 h-4/5">
               <Image 
                 src={Person} 
                 alt="person" 
@@ -69,7 +69,25 @@ const Bio = ({ Bio }) => {
                 priority
                 sizes="(max-width: 768px) 80vw, 40vw"
               />
-            </div>
+            </div> */}
+                <div 
+      className="absolute inset-0 flex items-center justify-center"
+      style={{
+        animation: 'float 6s ease-in-out infinite'
+      }}
+    >
+      <div className="relative w-4/5 md:w-3/4 h-4/5 group-hover:scale-105 transition-transform duration-500">        
+        <Image 
+          src={Person} 
+          alt="person" 
+          fill
+          className="object-contain drop-shadow-2xl relative z-10"
+          priority
+          sizes="(max-width: 768px) 80vw, 40vw"
+        />
+        
+        </div>
+    </div>
           </div>
         </div>
       </div>

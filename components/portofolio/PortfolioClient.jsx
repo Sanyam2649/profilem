@@ -14,6 +14,7 @@ import ProfileHeader from './ProfileHeader';
 import CustomSection from './CustomSection';
 
 import BackgroundImage from '@/public/Projects Page.png';
+import ContactPage from './contactPage';
 export default function PortfolioClient({ profileId }) {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -183,19 +184,67 @@ const renderSection = (section, index) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.55, ease: "easeOut" }}
-      className="relative py-10"
+      className="relative py-10 overflow-hidden"
     >
       {showBg && (
-        <div className="absolute inset-0 w-full h-full -z-10">
-          <Image
-            src={BackgroundImage}
-            alt="section background"
-            fill
-            priority
-            placeholder="empty"
-            quality={100}
-            className="object-cover object-center"
-          />
+        <div className="absolute inset-0 w-full h-full -z-10 group">
+          {/* Animated gradient overlay */}
+          <div 
+            className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 animate-fade-in"
+            style={{
+              animation: 'gradient-shift 8s ease infinite'
+            }}
+          ></div>
+          
+          {/* Background image with animations */}
+          <motion.div
+            initial={{ scale: 1.1, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="relative w-full h-full"
+          >
+            <Image
+              src={BackgroundImage}
+              alt="section background"
+              fill
+              priority
+              placeholder="empty"
+              quality={100}
+              className="object-cover object-center"
+              style={{
+                animation: 'subtle-zoom 20s ease-in-out infinite alternate'
+              }}
+            />
+          </motion.div>
+
+          {/* Animated overlay particles */}
+          <div 
+            className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full blur-sm"
+            style={{
+              animation: 'float-particle 6s ease-in-out infinite'
+            }}
+          ></div>
+          <div 
+            className="absolute top-1/3 right-20 w-3 h-3 bg-white/15 rounded-full blur-sm"
+            style={{
+              animation: 'float-particle 7s ease-in-out infinite 1s'
+            }}
+          ></div>
+          <div 
+            className="absolute bottom-20 left-1/4 w-2 h-2 bg-white/20 rounded-full blur-sm"
+            style={{
+              animation: 'float-particle 8s ease-in-out infinite 2s'
+            }}
+          ></div>
+
+          {/* Shimmer effect */}
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full"
+            style={{
+              animation: 'shimmer 6s ease-in-out infinite'
+            }}
+          ></div>
         </div>
       )}
 
@@ -203,6 +252,64 @@ const renderSection = (section, index) => {
     </motion.div>
   );
 };
+
+{/* Add these keyframes to your global CSS */}
+<style jsx>{`
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes subtle-zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes float-particle {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.3;
+    }
+    25% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-10px) translateX(20px);
+      opacity: 0.4;
+    }
+    75% {
+      transform: translateY(-30px) translateX(10px);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+`}</style>
 
 
   /* -----------------------------
@@ -233,6 +340,7 @@ const renderSection = (section, index) => {
         <div className="container mx-auto px-6 w-full">
 
           {rawSections.map((section, index) => renderSection(section, index))}
+           <ContactPage profile={profile}/>
 
         </div>
       </main>

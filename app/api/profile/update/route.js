@@ -1,28 +1,39 @@
-import { NextResponse } from 'next/server';
-import { updateProfile } from '../../../../lib/profile.js';
-import { authenticateRequest } from '@/lib/apiAuth.js';
+import { NextResponse } from "next/server";
+import { authenticateRequest } from "@/lib/apiAuth";
+import { updateProfile } from "@/lib/profile";
+import { Buffer } from "buffer";
 
 export async function PATCH(req) {
   try {
-    // Authenticate the request
     const { error, user } = await authenticateRequest(req);
-    
-    if (error) {
-      return error;
+    if (error) return error;
+
+    const formData = await req.formData();
+
+    const profileId = formData.get("profileId");
+    if (!profileId)
+      return NextResponse.json({ error: "Profile ID is required" }, { status: 400 });
+
+    const rawUpdates = formData.get("updates");
+    const updates = rawUpdates ? JSON.parse(rawUpdates) : {};
+
+    // Avatar handling
+    const avatarFile = formData.get("avatar");
+    if (avatarFile && avatarFile.size > 0) {
+      updates.avatarBuffer = Buffer.from(await avatarFile.arrayBuffer());
+      updates.avatarFileName = avatarFile.name;
     }
+    const updatedProfile = await updateProfile(
+      profileId,
+      updates,
+      user._id.toString()
+    );
 
-    const body = await req.json();
-    const { profileId, updates } = body;
-
-    if (!profileId || !updates) {
-      return NextResponse.json({ error: 'Profile ID and updates are required' }, { status: 400 });
-    }
-
-    // Use authenticated user's ID to ensure ownership
-    const updatedProfile = await updateProfile(profileId, updates, user._id.toString());
-    return NextResponse.json({ message: 'Profile updated', profile: updatedProfile });
+    return NextResponse.json(
+      { message: "Profile updated", profile: updatedProfile },
+      { status: 200 }
+    );
   } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

@@ -107,6 +107,13 @@ const CustomSectionSchema = new Schema(
 const personalSchema = new Schema(
     {
         name: { type: String },
+        avatar: {
+        url: String,
+        originalName: String,
+        mimetype: String,
+        publicId: String,
+        resourceType: String
+    },
         bio: { type: String },
         designation : {type : String},
         location: { type: String },

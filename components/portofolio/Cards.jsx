@@ -10,7 +10,8 @@ import {
   Award,
   Code,
   Star,
-  ExternalLink
+  ExternalLink,
+  Github
 } from "lucide-react";
 
 
@@ -135,7 +136,7 @@ export function ProjectCard({ project }) {
         <a
           href={project.link}
           target="_blank"
-          className="px-4 py-2 rounded-xl bg-[#00ADB5] text-white text-sm font-semibold hover:bg-white hover:text-[#00ADB5]"
+          className="px-4 py-2 rounded-xl bg-[#00ADB5] text-white text-sm font-semibold hover:bg-transparent hover:border-[#00ADB5] hover:border hover:text-[#00ADB5]"
         >
           Live Demo
         </a>
@@ -149,10 +150,10 @@ export function ProjectCard({ project }) {
             px-4 py-2 rounded-xl bg-white border text-slate-700 
             text-sm font-semibold 
             dark:bg-slate-800 dark:border-slate-700 dark:text-white
-            hover:bg-[#00ADB5]
+            hover:bg-[#00ADB5] align-center
           "
         >
-          GitHub
+         <Github className="inline w-4 h-4"/> GitHub
         </a>
       )}
     </div>
@@ -214,13 +215,23 @@ export function ProjectCard({ project }) {
 /* SKILLS CARD – PARSE skills STRING INTO ARRAY */
 /* -------------------------------------------------------------------------- */
 
-export function SkillsCard({ title, skills = [], Icon = Star }) {
+export function SkillsCard({
+  title,
+  skills = [],
+  Icon = Star,
+  maxVisible = 8,     // You can configure how many to show initially
+}) {
+  const [expanded, setExpanded] = useState(false);
+
   const skillArray = Array.isArray(skills)
     ? skills
-    : skills
-        .split(",")
-        .map((x) => x.trim())
-        .filter(Boolean);
+    : skills.split(",").map(x => x.trim()).filter(Boolean);
+
+  const visibleSkills = expanded
+    ? skillArray
+    : skillArray.slice(0, maxVisible);
+
+  const hasMore = skillArray.length > maxVisible;
 
   return (
     <BaseCard
@@ -228,20 +239,39 @@ export function SkillsCard({ title, skills = [], Icon = Star }) {
       title={title}
       subtitle={`${skillArray.length} skills`}
       accent="rose"
+      className="
+        min-h-[260px]   /* Control card height */
+        max-h-[320px]   /* Ensure consistent grid layout */
+        overflow-hidden
+      "
     >
       <div className="flex flex-wrap gap-2">
-        {skillArray.map((s, i) => (
+        {visibleSkills.map((s, i) => (
           <span
             key={i}
             className="
               px-3 py-1 rounded-full 
-              bg-blur border hover:bg-[#00ADB5] text-white text-xs 
+              bg-blur border 
+              hover:bg-[#00ADB5] 
+              text-white text-xs
             "
           >
             {s}
           </span>
         ))}
       </div>
+
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="
+            mt-3 text-xs font-semibold 
+            text-[#00ADB5] hover:text-white
+          "
+        >
+          {expanded ? "Show less" : `Show more`}
+        </button>
+      )}
     </BaseCard>
   );
 }
@@ -312,10 +342,6 @@ export function EducationCard({ education }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* EXPERIENCE CARD – FULL JSON SUPPORT */
-/* -------------------------------------------------------------------------- */
-
 export function ExperienceCard({ experience }) {
   const [open, setOpen] = useState(false);
 
@@ -373,10 +399,6 @@ export function ExperienceCard({ experience }) {
     </BaseCard>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* HEADER TAG */
-/* -------------------------------------------------------------------------- */
 
 export function HeaderTag({ icon, title, subtitle }) {
   return (

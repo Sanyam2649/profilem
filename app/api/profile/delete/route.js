@@ -1,26 +1,39 @@
-import { NextResponse } from 'next/server';
-import { deleteProfile } from '@/lib/profile';
-import { authenticateRequest } from '@/lib/apiAuth.js';
+import { NextResponse } from "next/server";
+import { deleteProfile } from "@/lib/profile";
+import { authenticateRequest } from "@/lib/apiAuth.js";
 
 export async function POST(req) {
   try {
-    // Authenticate the request
+    // Authenticate user
     const { error, user } = await authenticateRequest(req);
-    
-    if (error) {
-      return error;
-    }
+    if (error) return error;
 
+    // Parse incoming JSON
     const { profileId } = await req.json();
+
     if (!profileId) {
-      return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Profile ID is required" },
+        { status: 400 }
+      );
     }
 
-    // Use authenticated user's ID to ensure ownership
+    // Delete profile + avatar (handled in deleteProfile)
     const deleted = await deleteProfile(profileId, user._id.toString());
-    return NextResponse.json({ message: deleted ? 'Profile deleted' : 'Profile not found', deleted });
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Profile not found or unauthorized" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Profile deleted successfully", deleted: true },
+      { status: 200 }
+    );
   } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
