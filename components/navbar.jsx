@@ -250,21 +250,21 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white/95 backdrop-blur-md border-b border-slate-300 px-4 py-3 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-linear-to-r from-[#9B5DE0] via-[#D78FEE] to-[#FDCFFA] backdrop-blur-md border-b border-[#FDCFFA] px-4 py-3 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div
             className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
             onClick={() => router.push('/')}
           >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#4E56C0] rounded-lg sm:rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-base sm:text-lg font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h1 className="text-base sm:text-lg font-bold bg-linear-to-r text-white bg-clip-text">
                 ProfileManager
               </h1>
-              <p className="text-xs text-gray-600 hidden sm:block">
+              <p className="text-xs text-[#FDCFFA] hidden sm:block">
                 Professional Profile Management
               </p>
             </div>
@@ -273,7 +273,7 @@ const Navbar = () => {
           {/* Right Side */}
           <div className="flex items-center gap-2">
             <button
-              className="md:hidden p-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition bg-white"
+              className="md:hidden p-2 rounded-lg border border-[#D78FEE] transition bg-white hover:text-[#4E56C0]"
               onClick={() => setMobileMenu((p) => !p)}
             >
               {mobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -285,25 +285,25 @@ const Navbar = () => {
                   <div
                     tabIndex={0}
                     role="button"
-                    className="flex items-center gap-2 sm:gap-3 p-2 rounded-xl bg-white hover:bg-gray-50 border border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-3 p-2 rounded-xl bg-white hover:bg-[#D78FEE] border border-slate-300  hover:border-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                   >
                     <UserAvatar user={user} size="md" />
                     <div className="hidden sm:block text-left">
-                      <div className="font-semibold text-gray-900 text-sm">{user.name}</div>
-                      <div className="text-xs text-gray-700">View Profile</div>
+                      <div className="font-semi text-sm">{user.name}</div>
+                      <div className="text-xs">View Profile</div>
                     </div>
                   </div>
 
                   <ul
                     tabIndex={-1}
-                    className="dropdown-content menu bg-white rounded-xl z-50 mt-2 w-64 sm:w-72 p-2 shadow-xl border border-slate-300"
+                    className="dropdown-content menu bg-blur rounded-xl z-50 mt-2 w-64 sm:w-72 p-2 shadow-xl border border-slate-300"
                   >
-                    <li className="p-3 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 mb-2">
+                    <li className="p-3 bg-linear-to-r from-[#4E56C0] via-[#D78FEE] to-[#FDCFFA] rounded-lg border border-[#FDCFFA] mb-2">
                       <div className="flex items-center gap-3">
                         <UserAvatar user={user} size="lg" />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-gray-900 truncate text-sm">{user.name}</h3>
-                          <p className="text-xs text-gray-700 truncate">{user.email}</p>
+                          <h3 className="font-bold text-white truncate text-sm uppercase">{user.name}</h3>
+                          <p className="text-xs text-white/90 truncate">{user.email}</p>
                         </div>
                       </div>
                     </li>
@@ -356,7 +356,7 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => setShowLoginModal(true)}
-                  className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
+                  className="bg-linear-to-r from-[#4E56C0] to-[#FDCFFA] hover:bg-[#4E56C0] text-white font-semibold py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
                 >
                   <Key className="w-4 h-4" />
                   <span>Sign In</span>
@@ -416,24 +416,24 @@ const Navbar = () => {
       {/* Profile Modal */}
       {showProfileModal && user && (
         <div className="modal modal-open">
-          <div className="modal-box relative bg-white border border-gray-300 rounded-xl p-0 overflow-hidden w-[95vw] max-w-md sm:max-w-2xl max-h-[90vh] overflow-y-auto text-gray-900">
+          <div className="modal-box relative bg-[#FDCFFA] border border-gray-300 rounded-xl p-0 overflow-hidden w-[95vw] max-w-md sm:max-w-2xl max-h-[90vh] overflow-y-auto text-gray-900">
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-linear-to-r from-blue-50 to-purple-50 border-b border-gray-300 p-4 sm:p-6">
+            <div className="sticky top-0 z-10 bg-[#4E56C0] to-purple-50 border-b border-gray-300 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#4E56C0] rounded-lg flex items-center justify-center shadow-md">
                     <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900">Edit Profile</h3>
-                    <p className="text-sm text-gray-700">Update your personal info</p>
+                    <h3 className="font-bold text-lg text-white">Edit Profile</h3>
+                    <p className="text-sm text-white/80">Update your personal info</p>
                   </div>
                 </div>
                 <button
-                  className="btn btn-sm btn-circle btn-ghost hover:bg-gray-200 text-gray-700"
+                  className="btn btn-sm btn-circle  border-0 btn-ghost hover:bg-transparent text-white"
                   onClick={() => setShowProfileModal(false)}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
             </div>
@@ -558,13 +558,13 @@ const Navbar = () => {
 
                     <div className="flex flex-col sm:flex-row gap-3 pt-3">
                       <button
-                        className="btn bg-white border-gray-400 hover:bg-gray-100 text-gray-900 flex-1 font-medium"
+                        className="btn bg-white border-gray-400 rounded-lg hover:bg-[#4E56C0] hover:text-white text-[#4E56C0] flex-1 font-medium"
                         onClick={() => setShowProfileModal(false)}
                       >
                         Cancel
                       </button>
                       <button
-                        className="btn bg-linear-to-r from-blue-600 to-purple-600 text-white border-0 flex-1 gap-2 shadow-md hover:shadow-lg font-medium"
+                        className="btn bg-[#4E56C0] rounded-lg text-white border  hover:bg-white hover:border-[#FDCFFA]  hover:text-[#4E56C0] flex-1 gap-2 shadow-md hover:shadow-lg font-medium"
                         onClick={handleProfileUpdate}
                         disabled={isUpdatingProfile}
                       >
@@ -623,7 +623,7 @@ const Navbar = () => {
               className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 hover:bg-gray-200 text-gray-700"
               onClick={() => setShowLoginModal(false)}
             >
-              <X className="w-4 h-4" />
+              <X className="w-6 h-6" />
             </button>
             <div className="p-4 sm:p-6 text-gray-900">
               <LoginForm
@@ -645,7 +645,7 @@ const Navbar = () => {
               className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 hover:bg-gray-200 text-gray-700"
               onClick={() => setShowRegisterModal(false)}
             >
-              <X className="w-4 h-4" />
+              <X className="w-6 h-6" />
             </button>
             <div className="p-4 sm:p-6 text-gray-900">
               <RegisterModal
@@ -663,10 +663,10 @@ const Navbar = () => {
         <dialog className="modal modal-open">
           <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md max-h-[90vh] overflow-y-auto text-gray-900">
             <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 hover:bg-gray-200 text-gray-700"
+              className="btn btn-sm btn-circle btn-ghost  border-0 absolute right-3 top-3 hover:bg-transparent text-gray-700"
               onClick={() => setShowSettingsModal(false)}
             >
-              <X className="w-4 h-4" />
+              <X className="w-6 h-6" />
             </button>
             <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 mb-6">

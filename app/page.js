@@ -30,19 +30,15 @@ const Home = () => {
   const goToDashboard = () => router.push('/dashboard');
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-[#4E56C0] to-[#FDCFFA] flex items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="text-center w-full max-w-sm sm:max-w-md md:max-w-lg space-y-10">
 
         {/* Heading */}
-        <div className="space-y-5">
-          <div className="relative inline-block px-2">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+        <div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-[#4E56C0] bg-clip-text text-transparent leading-tight">
               ProfileManager
             </h1>
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-full"></div>
-          </div>
-
-          <p className="text-base sm:text-lg md:text-xl text-slate-600 font-light px-3">
+          <p className="text-base sm:text-lg md:text-xl text-white font-light px-3">
             Manage your professional profile with ease
           </p>
         </div>
@@ -55,21 +51,20 @@ const Home = () => {
               <Button
                 title="Sign In"
                 onClick={openLogin}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
+                className="bg-[#4E56C0] text-white font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
               />
 
               <Button
                 title="Create Account"
                 onClick={openRegister}
-                className="bg-white hover:bg-slate-50 text-blue-600 border-2 border-blue-600 font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
+                className="bg-white hover:bg-slate-50 text-[#4E56C0] border-2 border-[#4E56C0] font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
               />
             </>
           ) : (
             <>
-              {/* Welcome Block */}
               <div className="text-center mb-2 sm:mb-4">
                 <div className="relative inline-block mb-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white shadow-lg mx-auto overflow-hidden bg-slate-200">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white shadow-lg mx-auto overflow-hidden bg-slate-200">
                     {(() => {
                       const avatarUrl = user?.avatar?.url || user?.avatar;
                       if (avatarUrl && avatarUrl.trim() !== '') {
@@ -90,10 +85,9 @@ const Home = () => {
                       );
                     })()}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white"></div>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-semibold text-slate-800">
+                <h2 className="text-xl sm:text-2xl font-semibold text-white">
                   Welcome back, {user.name}!
                 </h2>
                 <p className="text-slate-500 text-sm sm:text-base mt-1">
@@ -105,47 +99,19 @@ const Home = () => {
               <Button
                 title="Go to Dashboard"
                 onClick={goToDashboard}
-                className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
+                className="bg-[#4E56C0] hover:bg-white text-white hover:text-[#4E56C0] font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-transform duration-200 hover:-translate-y-0.5"
               />
 
               <Button
                 title="Logout"
                 onClick={handleLogout}
-                className="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300 font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-colors duration-200"
+                className="bg-white hover:bg-[#4E56C0] hover:text-white text-slate-700 border-2 border-slate-200 hover:border-slate-300 font-semibold py-3 sm:py-4 rounded-xl shadow-md hover:shadow-xl transition-colors duration-200"
               />
             </>
           )}
         </div>
       </div>
 
-      {/* {activeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 sm:p-6">
-          <div className="w-full max-w-sm sm:max-w-md bg-white shadow-2xl rounded-2xl p-6 relative animate-in fade-in-90 zoom-in-90">
-            <button
-              onClick={closeModal}
-              className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
-            >
-              <span className="text-slate-500 hover:text-slate-700 text-lg">✕</span>
-            </button>
-
-            {activeModal === 'login' && (
-              <LoginForm
-                onSwitchToRegister={() => setActiveModal('register')}
-                onSuccess={closeModal}
-              />
-            )}
-
-            {activeModal === 'register' && (
-              <RegisterModal
-                onSwitchToLogin={() => setActiveModal('login')}
-                onSuccess={closeModal}
-              />
-            )}
-          </div>
-        </div>
-      )} */}
-      
-      {/* Login Modal */}
 {activeModal === 'login' && (
   <dialog className="modal modal-open">
     <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">

@@ -276,7 +276,7 @@ return (
             <div className="flex items-start sm:items-center gap-4 mb-2 sm:mb-4 flex-col sm:flex-row">
               <div className="space-y-1">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-linear-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent leading-tight wrap-break-word">
-                  Welcome back, <span className="text-blue-600">{user?.name}</span>!
+                  Welcome back, <span className="text-[#4E56C0]">{user?.name}</span>!
                 </h1>
                 <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-tight">
                   Manage your professional profiles and showcase your skills.
@@ -290,9 +290,9 @@ return (
           <button
             onClick={handleCreateProfile}
             className="w-full sm:w-auto  text-base sm:text-lg 
- bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+ bg-[#4E56C0] text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
           >
-            <Plus className="w-5 h-5" /> Create New Profile
+            <Plus className="w-5 h-5" /> {profiles.length === 0 ? "Add Your first Profile" : "Add New Profile"}
           </button>
         </div>
       </div>
@@ -319,82 +319,25 @@ return (
           className="bg-white/80 backdrop-blur-sm border border-slate-200/60"
         />
       </div>
-
-      {/* Profiles + Search */}
+      
       <div className="space-y-8">
 
-        <div className="p-5 sm:p-6 md:p-8 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-sm flex flex-col gap-6">
 
-          {/* Title + Icon */}
-          <div className="flex items-start sm:items-center gap-4 flex-col sm:flex-row">
-            <div className="w-12 h-12 bg-linear-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shrink-0">
-              <FileText className="w-6 h-6 text-white" />
+            <div className="w-full sm:w-80 md:w-96">
+              <SearchBar
+                onSearch={handleSearch}
+              />
             </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Your Profiles</h2>
-              <p className="text-slate-600 text-sm sm:text-base">
-                Manage your professional profiles
-              </p>
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="w-full sm:w-80 md:w-96">
-            <SearchBar
-              onSearch={handleSearch}
-              placeholder="Search by name, email, or location..."
+            
+          <div className="w-full overflow-hidden">
+            <ProfileList
+              profiles={filteredProfiles}
+              onEdit={handleEditProfile}
+              onDelete={handleDeleteProfile}
+              isLoading={false}
             />
           </div>
-        </div>
-
-        {/* Profiles List */}
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="text-center">
-              <div className="loading loading-spinner loading-lg text-blue-600 mb-4"></div>
-              <p className="text-slate-600">Loading your profiles...</p>
-            </div>
-          </div>
-        ) : (
-          <div className="w-full overflow-x-hidden">
-          <ProfileList
-            profiles={filteredProfiles}
-            onEdit={handleEditProfile}
-            onDelete={handleDeleteProfile}
-            isLoading={false}
-          />
-          </div>
-        )}
       </div>
-
-      {/* Empty State */}
-      {!isLoading && profiles.length === 0 && (
-        <div className="bg-amber-50/80 border border-amber-200/60 rounded-2xl mt-12 p-8 backdrop-blur-sm">
-          <div className="flex flex-col lg:flex-row items-center gap-6 text-center lg:text-left">
-
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-8 h-8 text-amber-600" />
-            </div>
-
-            <div className="flex-1 space-y-2">
-              <h3 className="text-2xl font-bold text-amber-800">Start Your Professional Journey</h3>
-              <p className="text-amber-700/80 text-base sm:text-lg">
-                Create your first professional profile to showcase your skills and experience.
-              </p>
-            </div>
-
-            <button
-              onClick={handleCreateProfile}
-              className="w-full sm:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Create Your First Profile
-            </button>
-
-          </div>
-        </div>
-      )}
-
     </div>
 
     <ProfileFormModal

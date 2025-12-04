@@ -590,7 +590,7 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
 
         {/* Close Confirmation Dialog */}
         {showCloseConfirm && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50">
             <div className="bg-base-100 p-6 rounded-xl shadow-2xl max-w-md mx-4">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-full bg-amber-100">
@@ -657,7 +657,7 @@ if (editingData.sectionOrder && Array.isArray(editingData.sectionOrder)) {
     {/* Avatar Preview with Animation */}
     <div className="relative group">
       {/* Animated gradient ring */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-75 blur transition-opacity duration-500"></div>
+      <div className="absolute -inset-1 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-75 blur transition-opacity duration-500"></div>
       
       {/* Avatar container */}
       <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-base-100 shadow-xl transition-transform duration-300 group-hover:scale-105">

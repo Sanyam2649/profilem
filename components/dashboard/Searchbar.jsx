@@ -11,7 +11,7 @@ const SearchBar = ({
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       onSearch(query);
-    }, 300); // ⏳ Delay search until user stops typing
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [query, onSearch]);
@@ -29,12 +29,12 @@ const SearchBar = ({
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="input input-bordered text-black join-item flex-1 bg-white border-slate-300 focus:border-blue-500"
+          className="input input-bordered text-black join-item flex-1 bg-white border-[#4E56C0]"
         />
 
         <button
           type="submit"
-          className="btn bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 join-item"
+          className="btn bg-[#4E56C0] text-white border-0 join-item"
         >
           <Search className="w-4 h-4" />
         </button>

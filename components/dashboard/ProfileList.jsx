@@ -1,31 +1,73 @@
-import {useState } from 'react';
-import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye, Share2, X, Copy, Check, Mail } from 'lucide-react';
+import {useEffect, useState } from 'react';
+import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye, Share2, X, Copy, Check, Mail, Linkedin, Facebook } from 'lucide-react';
+import Image from 'next/image';
+
+const TINYURL_API_TOKEN = process.env.NEXT_PUBLIC_TINYURL_API_TOKEN; // or direct string
 
 const PortfolioModal = ({ isOpen, onClose, profile }) => {
   const [copied, setCopied] = useState(false);
-  const portfolioUrl = profile?._id ? `${window.location.origin}/${profile._id}` : '';
+  const [shortUrl, setShortUrl] = useState("");
+  const [loadingShort, setLoadingShort] = useState(false);
+
+  const portfolioUrl = profile?._id
+    ? `${window.location.origin}/${profile._id}`
+    : "";
+
+  useEffect(() => {
+    const createShortUrl = async () => {
+      if (!portfolioUrl) return;
+      setLoadingShort(true);
+
+      try {
+        const res = await fetch("https://api.tinyurl.com/create", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${TINYURL_API_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            url: portfolioUrl,
+            domain: "tinyurl.com"
+          })
+        });
+
+        const data = await res.json();
+        if (data?.data?.tiny_url) {
+          setShortUrl(data.data.tiny_url);
+        } else {
+          setShortUrl(portfolioUrl); // fallback
+        }
+      } catch (err) {
+        console.error("TinyURL Error:", err);
+        setShortUrl(portfolioUrl);
+      }
+
+      setLoadingShort(false);
+    };
+
+    if (isOpen) createShortUrl();
+  }, [isOpen, portfolioUrl]);
 
   const handleCopyLink = async () => {
-    if (portfolioUrl) {
-      await navigator.clipboard.writeText(portfolioUrl);
+    if (shortUrl) {
+      await navigator.clipboard.writeText(shortUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const handleShare = async (platform) => {
-    const text = `Check out ${profile?.name || 'this amazing'} portfolio!`;
-    
+  const handleShare = (platform) => {
+    const urlToShare = encodeURIComponent(shortUrl);
+    const text = encodeURIComponent(`Check out ${profile?.name || "this portfolio"}!`);
+
     const urls = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(portfolioUrl)}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(portfolioUrl)}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(portfolioUrl)}`,
-      whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + portfolioUrl)}`
+      twitter: `https://twitter.com/intent/tweet?text=${text}&url=${urlToShare}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${urlToShare}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${urlToShare}`,
+      whatsapp: `https://wa.me/?text=${text}%20${urlToShare}`
     };
 
-    if (urls[platform]) {
-      window.open(urls[platform], '_blank', 'width=600,height=400');
-    }
+    if (urls[platform]) window.open(urls[platform], "_blank", "width=600,height=400");
   };
 
   if (!isOpen || !profile) return null;
@@ -33,132 +75,87 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg">
       <div className="bg-linear-to-br from-white to-blue-50 rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-blue-200">
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-linear-to-r from-blue-600 to-purple-600 rounded-t-3xl">
-          <h3 className="text-lg font-bold text-white">
-            Portfolio Options
-          </h3>
-          <button
-            onClick={onClose}
-            className="btn btn-ghost btn-sm btn-circle hover:bg-white/20 text-white"
-          >
-            <X className="w-5 h-5" />
+        <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-[#9B5DE0] rounded-t-3xl">
+          <h3 className="text-lg font-bold text-white">Portfolio Options</h3>
+          <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle text-white hover:bg-white/20">
+            <X className="w-5 h-5"/>
           </button>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          
           {/* Profile Info */}
           <div className="flex items-center gap-4">
             <div className="avatar placeholder">
-             <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+            {profile?.personal?.avatar?.url ? <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+               <Image src={profile?.personal?.avatar?.url} alt={profile?.personal?.name || "P"} width={30} height={30} className='object-cover'/>
+              </div> :    <div className="w-12 h-12 bg-linear-to-b  bg-[#9B5DE0] rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">
-                  {profile.personal.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
+                  {profile.personal.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || "P"}
                 </span>
-              </div>
+              </div>}
             </div>
             <div>
-              <h4 className="font-bold text-gray-800 text-lg">
-                {profile.personal.name || 'Unnamed Profile'}
-              </h4>
-              <p className="text-sm text-gray-600">
-                {profile.personal.email || 'No email'}
-              </p>
+              <h4 className="font-bold text-gray-800 text-lg">{profile.personal.name || "Unnamed Profile"}</h4>
+              <p className="text-sm text-gray-600">{profile.personal.email || "No email"}</p>
             </div>
           </div>
 
-          {/* Portfolio URL */}
+          {/* Short URL Input */}
           <div className="space-y-2">
-            <label className="label">
-              <span className="label-text font-semibold text-gray-700">Portfolio URL</span>
-            </label>
+
             <div className="flex gap-2">
               <input
                 type="text"
-                value={portfolioUrl}
+                value={shortUrl}
                 readOnly
                 className="input input-bordered flex-1 text-sm bg-white border-2 border-blue-200 focus:border-blue-500 text-gray-800 font-medium"
               />
               <button
+                disabled={loadingShort}
                 onClick={handleCopyLink}
-                className="btn bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 btn-square"
-                title="Copy link"
+                className="btn bg-[#9B5DE0] text-white border-0 btn-square"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4"/> : <Copy className="w-4 h-4"/>}
               </button>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <button
-              onClick={() => {
-                window.open(portfolioUrl, '_blank');
-                onClose();
-              }}
-              className="btn bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 w-full gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-            >
-              <Eye className="w-5 h-5" />
-              View Portfolio
-            </button>
+          {/* View Portfolio */}
+          <button
+            onClick={() => window.open(shortUrl, "_blank")}
+            disabled={!shortUrl || loadingShort}
+            className="btn bg-[#9B5DE0] text-white w-full gap-2 shadow-lg hover:shadow-xl"
+          >
+            <Eye className="w-5 h-5"/>
+            View Portfolio
+          </button>
 
-            <div className="border-t border-blue-200 pt-4">
-  <label className="label">
-    <span className="label-text font-semibold text-gray-700">Share on Social Media</span>
-  </label>
-  <div className="grid grid-cols-2 gap-3">
-    <button
-      onClick={() => handleShare('twitter')}
-      className="btn bg-linear-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-    >
-      <span className="font-bold text-lg">𝕏</span>
-      Twitter
-    </button>
-    
-    <button
-      onClick={() => handleShare('linkedin')}
-      className="btn bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-    >
-      <svg className="w-5 h-5" viewBox="0 -2 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-        <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-          <g id="Color-" transform="translate(-702.000000, -265.000000)" fill="currentColor">
-            <path d="M746,305 L736.2754,305 L736.2754,290.9384 C736.2754,287.257796 734.754233,284.74515 731.409219,284.74515 C728.850659,284.74515 727.427799,286.440738 726.765522,288.074854 C726.517168,288.661395 726.555974,289.478453 726.555974,290.295511 L726.555974,305 L716.921919,305 C716.921919,305 717.046096,280.091247 716.921919,277.827047 L726.555974,277.827047 L726.555974,282.091631 C727.125118,280.226996 730.203669,277.565794 735.116416,277.565794 C741.21143,277.565794 746,281.474355 746,289.890824 L746,305 L746,305 Z M707.17921,274.428187 L707.117121,274.428187 C704.0127,274.428187 702,272.350964 702,269.717936 C702,267.033681 704.072201,265 707.238711,265 C710.402634,265 712.348071,267.028559 712.41016,269.710252 C712.41016,272.34328 710.402634,274.428187 707.17921,274.428187 L707.17921,274.428187 L707.17921,274.428187 Z M703.109831,277.827047 L711.685795,277.827047 L711.685795,305 L703.109831,305 L703.109831,277.827047 L703.109831,277.827047 Z" id="LinkedIn"></path>
-          </g>
-        </g>
-      </svg>
-      LinkedIn
-    </button>
-    
-    <button
-      onClick={() => handleShare('facebook')}
-      className="btn bg-linear-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-    >
-      <svg className="w-5 h-5" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-        <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-          <g id="Color-" transform="translate(-200.000000, -160.000000)" fill="currentColor">
-            <path d="M225.638355,208 L202.649232,208 C201.185673,208 200,206.813592 200,205.350603 L200,162.649211 C200,161.18585 201.185859,160 202.649232,160 L245.350955,160 C246.813955,160 248,161.18585 248,162.649211 L248,205.350603 C248,206.813778 246.813769,208 245.350955,208 L233.119305,208 L233.119305,189.411755 L239.358521,189.411755 L240.292755,182.167586 L233.119305,182.167586 L233.119305,177.542641 C233.119305,175.445287 233.701712,174.01601 236.70929,174.01601 L240.545311,174.014333 L240.545311,167.535091 C239.881886,167.446808 237.604784,167.24957 234.955552,167.24957 C229.424834,167.24957 225.638355,170.625526 225.638355,176.825209 L225.638355,182.167586 L219.383122,182.167586 L219.383122,189.411755 L225.638355,189.411755 L225.638355,208 L225.638355,208 Z" id="Facebook"></path>
-          </g>
-        </g>
-      </svg>
-      Facebook
-    </button>
-    
-    <button
-      onClick={() => handleShare('whatsapp')}
-      className="btn bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-    >
-      <svg className="w-5 h-5" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-        <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-          <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="currentColor">
-            <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"></path>
-          </g>
-        </g>
-      </svg>
-      WhatsApp
-    </button>
-  </div>
-</div>
+          {/* Share */}
+          <div className="border-t border-blue-200 pt-4">
+            <label className="label">
+              <span className="label-text font-semibold text-gray-700">Share on Social Media</span>
+            </label>
+            <div className="flex flex-row gap-2 opacity-100">
+              <button className="text-white border-0" onClick={() => handleShare("twitter")}>
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" className='w-8 h-8' viewBox="0 0 50 50">
+<path d="M 6.9199219 6 L 21.136719 26.726562 L 6.2285156 44 L 9.40625 44 L 22.544922 28.777344 L 32.986328 44 L 43 44 L 28.123047 22.3125 L 42.203125 6 L 39.027344 6 L 26.716797 20.261719 L 16.933594 6 L 6.9199219 6 z"></path>
+</svg></button>
+              <button className=" text-white border-0" onClick={() => handleShare("linkedin")}><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"  className='w-8 h-8' viewBox="0 0 48 48">
+<path fill="#0288D1" d="M42,37c0,2.762-2.238,5-5,5H11c-2.761,0-5-2.238-5-5V11c0-2.762,2.239-5,5-5h26c2.762,0,5,2.238,5,5V37z"></path><path fill="#FFF" d="M12 19H17V36H12zM14.485 17h-.028C12.965 17 12 15.888 12 14.499 12 13.08 12.995 12 14.514 12c1.521 0 2.458 1.08 2.486 2.499C17 15.887 16.035 17 14.485 17zM36 36h-5v-9.099c0-2.198-1.225-3.698-3.192-3.698-1.501 0-2.313 1.012-2.707 1.99C24.957 25.543 25 26.511 25 27v9h-5V19h5v2.616C25.721 20.5 26.85 19 29.738 19c3.578 0 6.261 2.25 6.261 7.274L36 36 36 36z"></path>
+</svg></button>
+              <button className=" text-white border-0" onClick={() => handleShare("facebook")}><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"  className='w-8 h-8' viewBox="0 0 48 48">
+<path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"></path><path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"></path>
+</svg></button>
+              <button className="text-white border-0" onClick={() => handleShare("whatsapp")}><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"  className='w-8 h-8' viewBox="0 0 48 48">
+<path fill="#fff" d="M4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5c5.1,0,9.8,2,13.4,5.6	C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19c0,0,0,0,0,0h0c-3.2,0-6.3-0.8-9.1-2.3L4.9,43.3z"></path><path fill="#fff" d="M4.9,43.8c-0.1,0-0.3-0.1-0.4-0.1c-0.1-0.1-0.2-0.3-0.1-0.5L7,33.5c-1.6-2.9-2.5-6.2-2.5-9.6	C4.5,13.2,13.3,4.5,24,4.5c5.2,0,10.1,2,13.8,5.7c3.7,3.7,5.7,8.6,5.7,13.8c0,10.7-8.7,19.5-19.5,19.5c-3.2,0-6.3-0.8-9.1-2.3	L5,43.8C5,43.8,4.9,43.8,4.9,43.8z"></path><path fill="#cfd8dc" d="M24,5c5.1,0,9.8,2,13.4,5.6C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19h0c-3.2,0-6.3-0.8-9.1-2.3	L4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5 M24,43L24,43L24,43 M24,43L24,43L24,43 M24,4L24,4C13,4,4,13,4,24	c0,3.4,0.8,6.7,2.5,9.6L3.9,43c-0.1,0.3,0,0.7,0.3,1c0.2,0.2,0.4,0.3,0.7,0.3c0.1,0,0.2,0,0.3,0l9.7-2.5c2.8,1.5,6,2.2,9.2,2.2	c11,0,20-9,20-20c0-5.3-2.1-10.4-5.8-14.1C34.4,6.1,29.4,4,24,4L24,4z"></path><path fill="#40c351" d="M35.2,12.8c-3-3-6.9-4.6-11.2-4.6C15.3,8.2,8.2,15.3,8.2,24c0,3,0.8,5.9,2.4,8.4L11,33l-1.6,5.8	l6-1.6l0.6,0.3c2.4,1.4,5.2,2.2,8,2.2h0c8.7,0,15.8-7.1,15.8-15.8C39.8,19.8,38.2,15.8,35.2,12.8z"></path><path fill="#fff" fillRule="evenodd" d="M19.3,16c-0.4-0.8-0.7-0.8-1.1-0.8c-0.3,0-0.6,0-0.9,0	s-0.8,0.1-1.3,0.6c-0.4,0.5-1.7,1.6-1.7,4s1.7,4.6,1.9,4.9s3.3,5.3,8.1,7.2c4,1.6,4.8,1.3,5.7,1.2c0.9-0.1,2.8-1.1,3.2-2.3	c0.4-1.1,0.4-2.1,0.3-2.3c-0.1-0.2-0.4-0.3-0.9-0.6s-2.8-1.4-3.2-1.5c-0.4-0.2-0.8-0.2-1.1,0.2c-0.3,0.5-1.2,1.5-1.5,1.9	c-0.3,0.3-0.6,0.4-1,0.1c-0.5-0.2-2-0.7-3.8-2.4c-1.4-1.3-2.4-2.8-2.6-3.3c-0.3-0.5,0-0.7,0.2-1c0.2-0.2,0.5-0.6,0.7-0.8	c0.2-0.3,0.3-0.5,0.5-0.8c0.2-0.3,0.1-0.6,0-0.8C20.6,19.3,19.7,17,19.3,16z" clipRule="evenodd"></path>
+</svg></button>    
+            </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -189,12 +186,12 @@ const ProfileList = ({
 
   if (isLoading) {
     return (
-      <div className="card bg-linear-to-br from-white to-blue-50 shadow-2xl border-2 border-blue-200 rounded-3xl">
+      <div className="card bg-linear-to-br from-white to-blue-50 shadow-2xl border border-blue-200 rounded-3xl">
         <div className="card-body">
           <div className="overflow-x-auto">
             <table className="table w-full">
               <thead>
-                <tr className="bg-linear-to-r from-blue-500 to-purple-500 text-white">
+                <tr className="bg-[#4E56C0] text-white">
                   <th className="w-12 text-center rounded-tl-2xl">#</th>
                   <th>Name</th>
                   <th>Email</th>
@@ -228,32 +225,34 @@ const ProfileList = ({
    (profiles.length > 0 &&  <>
       <div className="space-y-6">
         {/* Table */}
-        <div className="card bg-linear-to-br from-white to-blue-50 text-gray-800 shadow-2xl border-2 border-blue-200 rounded-3xl overflow-hidden">
+        <div className="card bg-linear-to-br from-white to-blue-50 rounded-t-3xl text-gray-800 shadow-2xl border-2 border-blue-200 overflow-hidden">
           <div className="card-body p-0">
             <div className="overflow-x-auto">
-              <table className="table w-full border-separate table-auto">
+              <table className="table w-full border-collapse table-auto">
                 <thead>
-                  <tr className="bg-linear-to-r from-blue-500 to-purple-500 text-white text-sm font-bold">
-                    <th className="w-12 text-center py-4 rounded-tl-3xl justify-center">#</th>
-                    <th className="py-4">Profile</th>
-                    <th className="py-4">Email</th>
-                    <th className="text-center py-4">Experience</th>
-                    <th className="text-center py-4">Education</th>
-                    <th className="w-48 text-center py-4 rounded-tr-3xl">Actions</th>
+                  <tr className="bg-[#4E56C0] text-white text-sm font-bold text-center">
+                    <th className="w-12 text-center py-4 rounded-tl-3xl justify-center">Id</th>
+                    <th className="py-4 border-white border-x">Profile</th>
+                    <th className="py-4 border-white border-x">Email</th>
+                    <th className="text-center py-4 border-white border-x">Experience</th>
+                    <th className="text-center py-4 border-white border-x">Education</th>
+                    <th className="w-48 text-center py-4 rounded-tr-3xl border-white border-x">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentProfiles.map((profile, index) => (
                     <tr key={profile._id || profile.personal.email} className="hover:bg-blue-50/80 transition-all duration-200 border-b border-blue-100 last:border-b-0">
-                      <td className="text-center font-bold text-blue-600 py-4">
+                      <td className="text-center font-bold text-[#4E56C0] py-4">
                         {startIndex + index + 1}
                       </td>
                       <td className="py-4">
                         <div className="flex items-center gap-4">
                           <div className="avatar placeholder">
-                           <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                           <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                               <span className="text-white font-bold text-sm">
-                                {profile?.personal?.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'P'}
+                                {profile?.personal?.avatar?.url ? <Image src={profile?.personal?.avatar?.url} alt={profile?.personal?.name || "user"} fill className='object-contain rounded-full'/> : 
+                                profile?.personal?.name ? profile?.personal?.name .split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) : 'P'
+                                }
                               </span>
                             </div>
                           </div>
