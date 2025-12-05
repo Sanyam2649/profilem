@@ -106,7 +106,7 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
           )}
         </button>
 
-        <p className="mt-4 text-center text-sm text-slate-600">
+        {/* <p className="mt-4 text-center text-sm text-slate-600">
           Are you a new user?{' '}
           <strong
             className="ml-1 cursor-pointer text-blue-600 hover:text-blue-700"
@@ -115,7 +115,7 @@ const LoginForm = ({ onSwitchToRegister, onSuccess, onClose }) => {
             Sign up
           </strong>{' '}
           here
-        </p>
+        </p> */}
       </fieldset>
     </form>
   );

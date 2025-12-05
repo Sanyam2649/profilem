@@ -1,6 +1,8 @@
+'use client';
 import {useEffect, useState } from 'react';
-import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye, Share2, X, Copy, Check, Mail, Linkedin, Facebook } from 'lucide-react';
+import { Edit3, Trash2, ChevronLeft, ChevronRight, Eye, Share2, X, Copy, Check, Mail, Linkedin, Facebook, Download } from 'lucide-react';
 import Image from 'next/image';
+import { generatePrintableHTML } from '@/app/generatedPrintablePdf';
 
 const TINYURL_API_TOKEN = process.env.NEXT_PUBLIC_TINYURL_API_TOKEN; // or direct string
 
@@ -183,6 +185,47 @@ const ProfileList = ({
     setSelectedProfile(profile);
     setIsModalOpen(true);
   };
+  
+  const handleOpenPortfolio = (profile) => {
+  if (!profile?._id) return;
+  const portfolioUrl = `${window.location.origin}/${profile._id}`;
+  window.open(portfolioUrl, "_blank");
+};
+
+const handleDownloadPDF = async (profile) => {
+  if (typeof window === "undefined") return;
+  if (!profile?._id) return;
+
+  try {
+    // Generate full HTML page for printing
+    const htmlContent = generatePrintableHTML(profile);
+
+    // Convert to Blob
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+
+    // Open in a new tab — this page itself handles PDF generation UI
+    window.open(url, "_blank");
+
+    // Cleanup when tab closed
+    const timer = setInterval(() => {
+      try {
+        const win = window.open('', '_blank');
+        if (!win || win.closed) {
+          clearInterval(timer);
+          URL.revokeObjectURL(url);
+        }
+      } catch {
+        clearInterval(timer);
+      }
+    }, 2000);
+
+  } catch (error) {
+    console.error("Redirection error:", error);
+  }
+};
+
+
 
   if (isLoading) {
     return (
@@ -222,7 +265,8 @@ const ProfileList = ({
   }
   
   return (
-   (profiles.length > 0 &&  <>
+     <div>
+   {profiles.length > 0 ? <>
       <div className="space-y-6">
         {/* Table */}
         <div className="card bg-linear-to-br from-white to-blue-50 rounded-t-3xl text-gray-800 shadow-2xl border-2 border-blue-200 overflow-hidden">
@@ -281,6 +325,22 @@ const ProfileList = ({
                       </td>
                       <td className="py-4">
                         <div className="flex justify-center gap-2">
+                            <button
+                            onClick={() => handleOpenPortfolio(profile)}
+                            className="btn bg-linear-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 btn-sm gap-1 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                            title="Portfolio Options"
+                            disabled={!profile._id}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                           <button
+                              onClick={() => handleDownloadPDF(profile)}
+                              className="btn bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 btn-sm shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                              title="Download PDF"
+                              disabled={!profile._id}
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
                           <button
                             onClick={() => handlePortfolioAction(profile)}
                             className="btn bg-linear-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white border-0 btn-sm gap-1 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
@@ -382,8 +442,10 @@ const ProfileList = ({
         }}
         profile={selectedProfile}
       />
-    </>)
-  );
+    </> : (
+      <p className="text-center text-gray-600">No profiles found.</p>
+    )}
+</div>  );
 };
 
 export default ProfileList;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, X, Sparkles, Download } from 'lucide-react';
+import { ChevronDown, X, Sparkles} from 'lucide-react';
 import Image from 'next/image';
 
 import ExperienceSection from './ExperienceSection';
@@ -324,15 +324,6 @@ const renderSection = (section, index) => {
           className="h-full bg-linear-to-r from-[#00ADB5] via-purple-500 to-pink-500 transition-all"
           style={{ width: `${scrollProgress}%` }}
         />
-
-        {/* Download Button */}
-        <button
-          onClick={() => window.print()}
-          className="no-print fixed top-6 right-6 flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#00ADB5] text-white shadow-lg z-50"
-        >
-          <Download className="w-5 h-5" />
-          <span>Download</span>
-        </button>
       </div>
 
       {/* MAIN CONTENT */}

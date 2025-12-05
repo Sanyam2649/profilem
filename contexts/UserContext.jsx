@@ -153,7 +153,7 @@ export const UserProvider = ({ children }) => {
       localStorage.removeItem('user');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      router.push('/');
+      router.push('/login');
     }
   };
 

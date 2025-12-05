@@ -22,7 +22,7 @@ import {
   Menu,
 } from 'lucide-react';
 import LoginForm from './login';
-import RegisterModal from './register';
+// import RegisterModal from './register';
 import { useUser } from '@/contexts/UserContext';
 
 // Utility function to get initials from name
@@ -119,7 +119,7 @@ const Navbar = () => {
   const handleLogout = useCallback(() => {
     logout();
     setShowLogoutModal(false);
-    router.push('/');
+    router.push('/login');
   }, [logout, router]);
 
   const handleLoginSuccess = useCallback((userData) => {
@@ -323,7 +323,7 @@ const Navbar = () => {
                         </div>
                       </a>
                     </li>
-                    <li>
+                    {/* <li>
                       <a
                         onClick={() => setShowSettingsModal(true)}
                         className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
@@ -336,7 +336,7 @@ const Navbar = () => {
                           <div className="text-xs text-gray-600">Manage preferences</div>
                         </div>
                       </a>
-                    </li>
+                    </li> */}
                     <li className="border-t border-gray-300 mt-2 pt-2">
                       <a
                         onClick={() => setShowLogoutModal(true)}
@@ -629,7 +629,6 @@ const Navbar = () => {
               <LoginForm
                 onSuccess={handleLoginSuccess}
                 onClose={() => setShowLoginModal(false)}
-                onSwitchToRegister={openRegisterFromLogin}
               />
             </div>
           </div>
@@ -638,7 +637,7 @@ const Navbar = () => {
       )}
 
       {/* Register Modal */}
-      {showRegisterModal && (
+      {/* {showRegisterModal && (
         <dialog className="modal modal-open">
           <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
             <button
@@ -656,10 +655,10 @@ const Navbar = () => {
           </div>
           <div className="modal-backdrop bg-black/50" onClick={() => setShowRegisterModal(false)} />
         </dialog>
-      )}
+      )} */}
 
       {/* Settings Modal */}
-      {showSettingsModal && user && (
+      {/* {showSettingsModal && user && (
         <dialog className="modal modal-open">
           <div className="modal-box relative bg-white border border-gray-300 rounded-xl w-[95vw] max-w-md max-h-[90vh] overflow-y-auto text-gray-900">
             <button
@@ -718,7 +717,7 @@ const Navbar = () => {
           </div>
           <div className="modal-backdrop bg-black/50" onClick={() => setShowSettingsModal(false)} />
         </dialog>
-      )}
+      )} */}
     </>
   );
 };

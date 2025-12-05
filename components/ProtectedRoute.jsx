@@ -10,7 +10,11 @@ export default function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/');
+      router.push('/login');
+    }
+    else if(user)
+    {
+      router.push('/dashboard');
     }
   }, [user, isLoading, router]);
 

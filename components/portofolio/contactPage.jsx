@@ -5,6 +5,7 @@ import { Mail, Phone, MapPin, Globe, Github, Linkedin, PhoneCall, Twitter, Home,
 import Image from "next/image";
 import Background from "@/public/Group 2372.png";
 import { HeaderTag } from "./Cards";
+import {useForm ,  ValidationError } from "@formspree/react";
 
 // Smooth scroll function
 const scrollToSection = (id) => {
@@ -44,7 +45,7 @@ const ContactPage = ({ profile }) => {
 
           {/* RIGHT FORM */}
           <div className="w-full md:w-1/2 mt-10 md:mt-0 flex justify-center">
-            <SimpleContactForm />
+            <SimpleContactForm  profileName={profile.personal.name}/>
           </div>
         </div>
       </section>
@@ -98,50 +99,33 @@ const ContactPage = ({ profile }) => {
 export default ContactPage;
 
 
-function SimpleContactForm() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+function SimpleContactForm({ profileName }) {
+const FormId = process.env.NEXT_PUBLIC_FORM_ID;
+  const [state, handleSubmit] = useForm(FormId);
+  const [message, setMessage] = useState("");
 
-  const [status, setStatus] = useState("");
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setStatus("sending");
-
-    const res = await fetch("/api/send-message", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    if (res.ok) {
-      setStatus("sent");
-      setForm({ name: "", email: "", message: "" });
-    } else {
-      setStatus("error");
-    }
+  if (state.succeeded) {
+    return (
+      <p className="text-green-400 text-sm">Message sent successfully!</p>
+    );
   }
 
   return (
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-        {/* Row: Name + Email */}
+    <form onSubmit={(e) => {
+        e.preventDefault();
+
+        const fullMessage = `Hi! This is the query for ${profileName}\n\n${message}`;
+
+        const formData = new FormData(e.target);
+        formData.set("message", fullMessage);
+        handleSubmit(formData);
+      }} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm text-white">Your name</label>
             <input
               name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Name"
+              type="text"
               className="w-full mt-1 px-4 py-3 rounded-xl bg-[#2D333B] text-white outline-none border border-transparent focus:border-teal-500"
               required
             />
@@ -151,47 +135,35 @@ function SimpleContactForm() {
             <label className="text-sm text-white">Your email</label>
             <input
               name="email"
+              id="email"
               type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Email"
               className="w-full mt-1 px-4 py-3 rounded-xl bg-[#2D333B] text-white outline-none border border-transparent focus:border-teal-500"
               required
             />
-          </div>
+        <ValidationError prefix="Email" field="email" errors={state.errors} />
         </div>
-
-        {/* Message */}
+       </div>
         <div>
           <label className="text-sm text-white">Your Message</label>
           <textarea
             name="message"
-            value={form.message}
-            onChange={handleChange}
+            id="message"
             rows={6}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
             placeholder="Message"
             className="w-full mt-1 px-4 py-3 rounded-xl bg-[#2D333B] text-white outline-none border border-transparent focus:border-teal-500 resize-none"
             required
           />
+        <ValidationError prefix="Message" field="message" errors={state.errors} />
         </div>
 
-        {/* Button */}
-        <button
-          type="submit"
-          className="flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-full text-sm hover:bg-teal-600 transition"
-        >
-          Send Message <Send className="w-4 h-4" />
+      <button
+        type="submit"
+        disabled={state.submitting}
+          className="flex items-center gap-2 bg-[#00ADB5] text-white px-6 py-3 rounded-full text-sm hover:bg-teal-600 transition">
+        {state.submitting ? "Sending..." : "Send Message"} <Send className="w-4 h-4" />
         </button>
-
-        {status === "sending" && (
-          <p className="text-yellow-400 text-sm">Sending message…</p>
-        )}
-        {status === "sent" && (
-          <p className="text-green-400 text-sm">Message sent successfully!</p>
-        )}
-        {status === "error" && (
-          <p className="text-red-400 text-sm">Something went wrong.</p>
-        )}
       </form>
   );
 }

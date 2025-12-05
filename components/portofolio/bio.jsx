@@ -60,16 +60,6 @@ const Bio = ({ Bio }) => {
           
           {/* Person Image - Overlapping */}
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* <div className="relative w-4/5 md:w-3/4 h-4/5">
-              <Image 
-                src={Person} 
-                alt="person" 
-                fill
-                className="object-contain drop-shadow-2xl"
-                priority
-                sizes="(max-width: 768px) 80vw, 40vw"
-              />
-            </div> */}
                 <div 
       className="absolute inset-0 flex items-center justify-center"
       style={{

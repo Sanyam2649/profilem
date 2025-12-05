@@ -26,69 +26,6 @@ body {
   display: none;
 }
 
-/* ========================================== */
-/* PRINT CLEANUP STYLES                       */
-/* ========================================== */
-
-@media print {
-
-  /* Hide all elements with class "no-print" */
-  .no-print {
-    display: none !important;
-  }
-
-  /* Force full color printing */
-  body {
-    -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-    background: #ffffff !important;
-  }
-
-  /* Fix background gradients */
-  .print-bg,
-  .print-bg * {
-    -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-  }
-
-  /* Remove page margins → let browser control it */
-  @page {
-    margin: 0;
-  }
-
-  /* Fix container width for print */
-  .container {
-    max-width: 100% !important;
-  }
-
-  /* Remove shadows & rounded corners for a clean print */
-  .shadow-xl,
-  .shadow-lg,
-  .shadow-md,
-  .shadow-sm {
-    box-shadow: none !important;
-  }
-
-  .rounded-xl,
-  .rounded-2xl,
-  .rounded-lg {
-    border-radius: 0 !important;
-  }
-
-  /* Remove scrolling & progress bars */
-  ::-webkit-scrollbar {
-    display: none !important;
-  }
-
-  /* Ensure text colors stay exact */
-  * {
-    color-adjust: exact !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-}
-
-
 
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
