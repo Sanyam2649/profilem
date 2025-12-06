@@ -276,9 +276,7 @@ export function SkillsCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* EDUCATION CARD – BASED ON JSON */
-/* -------------------------------------------------------------------------- */
+
 
 export function EducationCard({ education }) {
   const [open, setOpen] = useState(false);
@@ -352,6 +350,10 @@ export function ExperienceCard({ experience }) {
     typeof experience.technologies === "string"
       ? experience.technologies.split(",").map((x) => x.trim())
       : experience.technologies || [];
+  
+  const desc = experience.description || "";
+   const TRUNC = 160;
+  const short = desc.slice(0, TRUNC) + (desc.length > TRUNC ? "..." : "");
 
   return (
     <BaseCard
@@ -360,27 +362,28 @@ export function ExperienceCard({ experience }) {
       subtitle={`${experience.company} • ${start} — ${end}`}
       accent="teal"
     >
-      <button
-        onClick={() => setOpen(!open)}
-        className="text-slate-600 dark:text-slate-400 mb-2 text-sm"
-      >
-        {open ? "Hide details" : "Show details"}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
+       <AnimatePresence initial={false}>
+          <motion.p
+            key={open ? "open" : "closed"}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <p className="whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-300">
-              {experience.description}
-            </p>
-          </motion.div>
+            {open ? desc : short}
+          </motion.p>
+        </AnimatePresence>
+       {desc.length > TRUNC && (
+          <button
+            onClick={() => setOpen(!open)}
+            className="
+              mt-3 text-[#00ADB5] 
+              font-semibold text-sm hover:underline
+            "
+          >
+            {open ? "Show less" : "Read more"}
+          </button>
         )}
-      </AnimatePresence>
 
       {tech.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -405,7 +408,7 @@ export function HeaderTag({ icon, title, subtitle }) {
     <div className="text-center mb-12">
       <div
         className="
-          inline-flex items-center gap-3 px-5 py-2.5 rounded-xl 
+          inline-flex items-center gap-1 px-5 py-2.5 rounded-xl 
           bg-blur hover:bg-[#393E46] shadow-sm hover:text-[#00ADB5] text-white
         "
       >

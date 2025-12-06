@@ -105,9 +105,42 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
               <p className="text-sm text-gray-600">{profile.personal.email || "No email"}</p>
             </div>
           </div>
+          
+          <div className="space-y-2">
+  <div className="flex gap-2">
+    
+    {loadingShort ? (
+      // Skeleton loading placeholder
+      <div className="flex-1 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+    ) : (
+      <input
+        type="text"
+        value={shortUrl}
+        readOnly
+        className="input input-bordered flex-1 text-sm bg-white border-2 border-blue-200 focus:border-blue-500 text-gray-800 font-medium"
+      />
+    )}
+    
+    <button
+      disabled={loadingShort}
+      onClick={handleCopyLink}
+      className="btn bg-[#9B5DE0] text-white border-0 btn-square disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+    >
+      {loadingShort ? (
+        // Small loading spinner icon
+        <span className="loading loading-spinner loading-sm"></span>
+      ) : copied ? (
+        <Check className="w-4 h-4" />
+      ) : (
+        <Copy className="w-4 h-4" />
+      )}
+    </button>
+  </div>
+</div>
+
 
           {/* Short URL Input */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
 
             <div className="flex gap-2">
               <input
@@ -124,17 +157,17 @@ const PortfolioModal = ({ isOpen, onClose, profile }) => {
                 {copied ? <Check className="w-4 h-4"/> : <Copy className="w-4 h-4"/>}
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* View Portfolio */}
-          <button
+          {/* <button
             onClick={() => window.open(shortUrl, "_blank")}
             disabled={!shortUrl || loadingShort}
             className="btn bg-[#9B5DE0] text-white w-full gap-2 shadow-lg hover:shadow-xl"
           >
             <Eye className="w-5 h-5"/>
             View Portfolio
-          </button>
+          </button> */}
 
           {/* Share */}
           <div className="border-t border-blue-200 pt-4">

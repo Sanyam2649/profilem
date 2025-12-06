@@ -15,43 +15,43 @@ import CustomSection from './CustomSection';
 
 import BackgroundImage from '@/public/Projects Page.png';
 import ContactPage from './contactPage';
-export default function PortfolioClient({ profileId }) {
-  const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function PortfolioClient({ profile }) {
+  // const [profile, setProfile] = useState(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [error, setError] = useState(null);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   /* -----------------------------
      FETCH PROFILE
   ------------------------------*/
-  const loadProfile = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // const loadProfile = useCallback(async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     setError(null);
 
-      const res = await fetch(`/api/profile/get`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profileId }),
-        cache: 'no-store',
-      });
+  //     const res = await fetch(`/api/profile/get`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ profileId }),
+  //       cache: 'no-store',
+  //     });
 
-      if (!res.ok) throw new Error('Failed to load profile');
-      const data = await res.json();
+  //     if (!res.ok) throw new Error('Failed to load profile');
+  //     const data = await res.json();
 
-      await new Promise((resolve) => setTimeout(resolve, 120));
+  //     await new Promise((resolve) => setTimeout(resolve, 120));
 
-      setProfile(data?.profile || null);
-    } catch (err) {
-      setError(err.message || 'Error loading profile');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [profileId]);
+  //     setProfile(data?.profile || null);
+  //   } catch (err) {
+  //     setError(err.message || 'Error loading profile');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [profileId]);
 
-  useEffect(() => {
-    loadProfile();
-  }, [loadProfile]);
+  // useEffect(() => {
+  //   loadProfile();
+  // }, [loadProfile]);
 
   /* -----------------------------
      SCROLL PROGRESS
@@ -99,25 +99,25 @@ export default function PortfolioClient({ profileId }) {
   /* -----------------------------
      LOADING UI
   ------------------------------*/
-  if (isLoading)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
-          <Sparkles className="w-7 h-7 text-white animate-spin" />
-        </div>
-      </div>
-    );
+  // if (isLoading)
+  //   return (
+  //     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+  //       <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
+  //         <Sparkles className="w-7 h-7 text-white animate-spin" />
+  //       </div>
+  //     </div>
+  //   );
 
-  if (!profile || error)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
-        <div className="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center mb-4">
-          <X className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-2xl font-bold mb-2">Portfolio Unavailable</h1>
-        <p className="text-gray-600">{error || 'Profile not found'}</p>
-      </div>
-    );
+  // if (!profile || error)
+  //   return (
+  //     <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+  //       <div className="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center mb-4">
+  //         <X className="w-8 h-8 text-white" />
+  //       </div>
+  //       <h1 className="text-2xl font-bold mb-2">Portfolio Unavailable</h1>
+  //       <p className="text-gray-600">{error || 'Profile not found'}</p>
+  //     </div>
+  //   );
 
   const orderedSections = getOrderedSections();
 
@@ -253,68 +253,7 @@ const renderSection = (section, index) => {
   );
 };
 
-{/* Add these keyframes to your global CSS */}
-<style jsx>{`
-  @keyframes gradient-shift {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
 
-  @keyframes subtle-zoom {
-    0% {
-      transform: scale(1);
-    }
-    100% {
-      transform: scale(1.05);
-    }
-  }
-
-  @keyframes float-particle {
-    0%, 100% {
-      transform: translateY(0px) translateX(0px);
-      opacity: 0.3;
-    }
-    25% {
-      transform: translateY(-20px) translateX(10px);
-      opacity: 0.6;
-    }
-    50% {
-      transform: translateY(-10px) translateX(20px);
-      opacity: 0.4;
-    }
-    75% {
-      transform: translateY(-30px) translateX(10px);
-      opacity: 0.5;
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(200%);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-`}</style>
-
-
-  /* -----------------------------
-     FINAL UI
-  ------------------------------*/
   return (
     <div className="relative min-h-screen bg-[#222831]">
 
@@ -328,7 +267,7 @@ const renderSection = (section, index) => {
 
       {/* MAIN CONTENT */}
       <main className="relative z-10">
-        <div className="container mx-auto px-6 w-full">
+        <div className="relative  overflow-hidden">
 
           {rawSections.map((section, index) => renderSection(section, index))}
            <ContactPage profile={profile}/>

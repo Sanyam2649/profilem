@@ -105,538 +105,523 @@ export const generatePrintableHTML = (profile) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(personal.name || 'Portfolio')} - PDF Ready</title>
     <style>
-        /* PDF PRINT STYLES */
-     @media print {
-    @page {
-        size: A4;
-        margin: 15mm;
-    }
     
-    body {
-        margin: 0;
-        padding: 0;
-        -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
-        background-color: #222831 !important;
-    }
-    
-    .container {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: #222831 !important;
-    }
-    
-    /* Ensure all sections have proper background */
-    section, .card, .experience-card, .certification-card {
-        background-color: rgba(15, 23, 42, 0.4) !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-    }
-    
-    /* Hide non-printable elements */
-    button, .no-print, #pdf-generate-btn, .pdf-loading {
-        display: none !important;
-    }
-    
-    /* Force colors */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
-    }
-    
-    /* Keep text colors */
-    .profile-name, .section-title, .card-title, 
-    .about-title, .cert-title, .custom-title,
-    .profile-designation, h1, h2, h3, p {
-        color: inherit !important;
-    }
+    /* Correct colors only during PDF export capture */
+body.export-mode {
+  background-color: #222831 !important;
 }
-    
- /* Add these to ensure backgrounds print properly */
-body, .container, section {
+
+body.export-mode #printable-container {
+  background-color: #222831 !important;
+}
+
+body.export-mode .card,
+body.export-mode .experience-card,
+body.export-mode .certification-card,
+body.export-mode .custom-item {
+  background-color: #263041 !important; /* solid dark instead of rgba */
+}
+
+body.export-mode .badge,
+body.export-mode .tag,
+body.export-mode .skill-tag {
+  background-color: rgba(0, 173, 181, 0.2) !important;
+  color: #00ADB5 !important;
+  border: 1px solid #00ADB5 !important;
+}
+
+@media print {
+
+  /* Perfect A4 fit — no white space */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    width: 210mm;
+    height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: #222831 !important; /* SAME as screen */
+    overflow: visible !important;
+  }
+
+  /* Keep your original dark background */
+  #printable-container,
+  .container {
+    width: 100% !important;
+    min-height: 100vh !important;
+    background: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /**********************
+   * DO NOT CHANGE ANY COLORS /
+   * DO NOT CHANGE ANY LAYOUT /
+   * ONLY prevent page breaks /
+   ***********************/
+
+  section,
+  .profile-section,
+  .about-section,
+  .experience-section,
+  .education-section,
+  .project-section,
+  .skills-section,
+  .certification-section,
+  .custom-section,
+  .card,
+  .experience-card,
+  .certification-card,
+  .custom-item,
+  .contact-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Preserve your existing grid exactly as on screen */
+  .cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  /* Links become static text with original colors */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* Hide only explicitly non-print UI */
+  button,
+  .no-print,
+  #pdf-generate-btn,
+  .pdf-loading,
+  #contact {
+    display: none !important;
+  }
+}
+
+
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   background-color: #222831;
+  color: #ffffff;
+  line-height: 1.6;
+  width: 210mm;
+  margin: 0 auto;
 }
 
-.card, .experience-card, .certification-card,
-.custom-item, .contact-item {
-  background-color: rgba(15, 23, 42, 0.4);
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+.container {
+  width: 210mm;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Ensure text remains visible */
-.profile-name, .section-title, .card-title,
-.about-title, .cert-title, .custom-title,
+section {
+  padding: 30px 0;
+  page-break-inside: avoid;
+}
+
+/* Section Header */
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 173, 181, 0.1);
+  border: 1px solid rgba(0, 173, 181, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.section-tag-text {
+  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 10px 0;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  page-break-after: avoid;
+}
+
+.profile-text {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
 .profile-designation {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00ADB5;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.contact-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #00ADB5;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.contact-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.social-section {
+  margin-top: 20px;
+}
+
+.social-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.social-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.profile-image-container {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 4px solid #00ADB5;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-section {
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.about-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 40px;
+    align-content:center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.about-images {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.doodle-bg,
+.person-img-wrapper {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.doodle-img {
+    width: 70%;
+    max-width: 450px;
+    object-fit: contain;
+}
+
+.person-img {
+    width: 55%;
+    max-width: 350px;
+    object-fit: contain;
+    z-index: 2;
+}
+
+/* RIGHT TEXT SECTION */
+.about-content {
+    width: 100%;
+}
+
+.about-title {
+    font-size: 2.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.about-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #cccccc;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card, .experience-card, .certification-card {
+  background-color: rgba(15, 23, 42, 0.4);
+  border: 0.5px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 20px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  background: #00ADB5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   color: #ffffff;
 }
-            section {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            
-            .card, .certification-card, .experience-card {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
-            
-            button, .submit-button, form {
-                display: none !important;
-            }
-            
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            a {
-                color: #222831 !important;
-                text-decoration: none !important;
-            }
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: #222831;
-            color: #ffffff;;
-            line-height: 1.6;
-            width: 210mm;
-            margin: 0 auto;
-        }
-        
-        .container {
-            width: 210mm;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* PDF Generate Button */
-        #pdf-generate-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 24px;
-            background: #00ADB5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        #pdf-generate-btn:hover {
-            background: #0099a0;
-        }
-        
-        /* Loading indicator */
-        .pdf-loading {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 12px;
-            z-index: 1001;
-            text-align: center;
-        }
-        
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #00ADB5;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        section {
-            padding: 30px 0;
-            page-break-inside: avoid;
-        }
-        
-        /* Section Header */
-        .section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .section-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0, 173, 181, 0.1);
-            border: 1px solid rgba(0, 173, 181, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .section-tag-text {
-            font-size: 0.875rem;
-            color: #ffffff;
-            font-weight: 600;
-        }
-        
-        .section-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffffff;
-            margin: 10px 0;
-        }
-        
-        /* Profile Header - Fixed Layout */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-            padding: 40px 0;
-            border-bottom: 2px solid #e5e7eb;
-            page-break-after: avoid;
-        }
-        
-        .profile-text {
-            flex: 1;
-        }
-        
-        .profile-name {
-            font-size: 3rem;
-            font-weight: 900;
-            color: #1a202c;
-            margin-bottom: 10px;
-        }
-        
-        .profile-designation {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #00ADB5;
-            margin-bottom: 20px;
-            display: block;
-        }
-        
-        .contact-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-            background: #222831;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            background: #00ADB5;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        
-        .contact-icon {
-            width: 20px;
-            height: 20px;
-            color: #00ADB5;
-        }
-        
-        .social-section {
-            margin-top: 20px;
-        }
-        
-        .social-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #222831;
-            margin-bottom: 12px;
-        }
-        
-        .social-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        
-        .profile-image-container {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 4px solid #00ADB5;
-        }
-        
-        .profile-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        /* About Section */
-        .about-section {
-            padding: 30px 0;
-            page-break-inside: avoid;
-        }
-        
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .about-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
-        
-        .about-text {
-            color: #ffffff;
-            font-size: 1rem;
-            line-height: 1.8;
-        }
-        
-        /* Cards Grid - Fixed 2 Column Layout */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .card, .experience-card, .certification-card {
-            background-color: rgba(15, 23, 42, 0.4);
-            border: 1px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 20px;
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-        
-        .card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            background: #00ADB5;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-        
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #00ADB5;
-            margin-bottom: 4px;
-        }
-        
-        .card-subtitle {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-        
-        .card-content {
-            color: #ffffff;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-        
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        
-        .skill-tag {
-            padding: 4px 10px;
-            background: rgba(0, 173, 181, 0.1);
-            color: #00ADB5;
-            border: 1px solid rgba(0, 173, 181, 0.3);
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .project-links {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .project-btn {
-            padding: 6px 14px;
-            background: #00ADB5;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 2px solid #00ADB5;
-        }
-        
-        .project-btn.github {
-            background: transparent;
-            color: #00ADB5;
-        }
-        
-        /* Certification Card */
-        .cert-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-        
-        .cert-issuer {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            background: rgba(0, 173, 181, 0.1);
-            border: 1px solid rgba(0, 173, 181, 0.2);
-            color: #00ADB5;
-            border-radius: 12px;
-        }
-        
-        .cert-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #00ADB5;
-            margin-bottom: 10px;
-        }
-        
-        .cert-date {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #6b7280;
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-        
-        .cert-verify-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: #00ADB5;
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 15px;
-        }
-        
-        /* Custom Sections */
-        .custom-section {
-            margin-bottom: 40px;
-            page-break-inside: avoid;
-        }
-        
-        .custom-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 800;
-            color: #222831;
-            margin-bottom: 30px;
-        }
-        
-        .custom-item {
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 30px;
-            background: white;
-            page-break-inside: avoid;
-        }
-        
-        .custom-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        
-        .custom-field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .custom-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #6b7280;
-        }
-        
-        .custom-value {
-            font-weight: 500;
-            line-height: 1.6;
-            color: #222831;
-        }
-        
-        .custom-url {
-            color: #00ADB5;
-            text-decoration: underline;
-            word-break: break-all;
-        }
-        
-        .custom-list {
-            list-style-type: disc;
-            padding-left: 20px;
-            margin-top: 4px;
-        }
-        
-        /* Contact Section - Hidden for PDF */
-        #contact {
-            display: none;
-        }
-        
-        @media print {
-            #contact {
-                display: none !important;
-            }
-        }
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #00ADB5;
+}
+
+.card-header p {
+  margin: 2px 0 0 0;
+  font-size: 0.9rem;
+}
+
+.card-content {
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.skill-tag {
+  padding: 4px 10px;
+  background: rgba(0, 173, 181, 0.1);
+  color: #00ADB5;
+  border: 1px solid rgba(0, 173, 181, 0.3);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.project-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.project-btn {
+  padding: 6px 14px;
+  background: #00ADB5;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid #00ADB5;
+}
+
+.project-btn.github {
+  background: transparent;
+  color: #00ADB5;
+}
+
+/* Certification Card */
+.cert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.cert-issuer {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: rgba(0, 173, 181, 0.1);
+  border: 1px solid rgba(0, 173, 181, 0.2);
+  color: #00ADB5;
+  border-radius: 12px;
+}
+
+.cert-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #00ADB5;
+  margin-bottom: 10px;
+}
+
+.cert-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.cert-verify-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #00ADB5;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+/* Custom Sections */
+.custom-section {
+  margin-bottom: 40px;
+  page-break-inside: avoid;
+}
+
+.custom-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+.custom-item {
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  background: rgba(15, 23, 42, 0.4);
+  page-break-inside: avoid;
+}
+
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.custom-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.custom-value {
+  font-weight: 500;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.custom-url {
+  color: #00ADB5;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.custom-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: 4px;
+}
+
+/* Contact Section - Hidden for PDF */
+#contact {
+  display: none;
+}
+
     </style>
 </head>
 <body>    
@@ -716,14 +701,41 @@ body, .container, section {
         </div>
     </section>
 
-    ${personal.bio ? `
-    <section class="about-section">
+${personal.bio ? `
+<section class="about-section">
+    
+    <div class="about-wrapper">
+
+        <!-- LEFT IMAGE SECTION -->
+        <div class="about-images">
+            <div class="doodle-bg">
+                <img 
+                    src="https://res.cloudinary.com/dhahajyth/image/upload/v1764913887/doodle_items_osbpjl.png" 
+                    alt="Background doodle"
+                    class="doodle-img"
+                >
+            </div>
+
+            <div class="person-img-wrapper">
+                <img 
+                    src="https://res.cloudinary.com/dhahajyth/image/upload/v1764913887/Group_62_nmkytv.png" 
+                    alt="Person"
+                    class="person-img"
+                >
+            </div>
+        </div>
+
+        <!-- RIGHT BIO TEXT SECTION -->
         <div class="about-content">
             <h2 class="about-title">About <span style="color: #00ADB5;">Me</span></h2>
             <p class="about-text">${escapeHtml(personal.bio)}</p>
         </div>
-    </section>
-    ` : ''}
+
+    </div>
+
+</section>
+` : ''}
+
     
     <!-- EXPERIENCE SECTION -->
     ${experience.length > 0 ? `
@@ -759,8 +771,8 @@ body, .container, section {
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="card-title">${escapeHtml(exp.position || 'Position')}</h3>
-                                <p class="card-subtitle">${escapeHtml(exp.company || 'Company')} • ${start} — ${end}</p>
+                                <h3>${escapeHtml(exp.position || 'Position')}</h3>
+                                <p>${escapeHtml(exp.company || 'Company')} • ${start} — ${end}</p>
                             </div>
                         </div>
                         <div class="card-content">
@@ -804,7 +816,7 @@ body, .container, section {
                         </div>
                         <div>
                             <h3 class="card-title">${escapeHtml(edu.institution || 'Institution')}</h3>
-                            <p class="card-subtitle">${escapeHtml(edu.degree || 'Degree')} • ${escapeHtml(edu.fieldOfStudy || 'Field')}</p>
+                            <p>${escapeHtml(edu.degree || 'Degree')} • ${escapeHtml(edu.fieldOfStudy || 'Field')}</p>
                         </div>
                     </div>
                     <div class="card-content">
@@ -971,66 +983,94 @@ body, .container, section {
     <!-- CUSTOM SECTIONS -->
     ${renderCustomSections(customSections)}
       </div>
-
-    <script>
-      // Auto Generate PDF on Page Load
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const element = document.getElementById("printable-container");
-          if (!element) {
-            console.error("Printable container not found");
-            return;
-          }
-
-          // Load html2pdf dynamically if missing
-          if (typeof html2pdf === "undefined") {
-            await new Promise((resolve, reject) => {
-              const script = document.createElement("script");
-              script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-              script.onload = resolve;
-              script.onerror = reject;
-              document.head.appendChild(script);
-            });
-          }
-
-          const name = "${escapeHtml(personal.name || "portfolio")}"
-            .replace(/[^a-z0-9]/gi, "_")
-            .toLowerCase();
-const opt = {
-  filename: name + "_portfolio.pdf",
-  margin: 10,
-  image: { type: "jpeg", quality: 0.98 },
-  html2canvas: {
-    scale: 2, // Higher scale for better quality
-    useCORS: true,
-    backgroundColor: "#222831", // Explicitly set background color
-    letterRendering: true,
-  },
-  jsPDF: { 
-    unit: "mm", 
-    format: "a4", 
-    orientation: "portrait",
-    compress: true
-  },
-  pagebreak: {
-    mode: ["avoid-all", "css", "legacy"],
-    before: ".section-header",
-    after: ".card, .experience-card, .certification-card"
-  },
-};
-
-          // Generate & download PDF automatically
-          await html2pdf().set(opt).from(element).save();
-
-          // Close window after download finishes
-          setTimeout(() => window.close(), 1500);
-        } catch (error) {
-          console.error("Auto PDF generation failed:", error);
-        }
-      });
-    </script>
-
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // Section order – adjust if needed
+    const sections = [
+      ".profile-section",
+      ".about-section",
+      ".experience-section",
+      ".education-section",
+      ".project-section",
+      ".skills-section",
+      ".certification-section"
+    ];
+
+    // Load html2pdf if needed
+    if (typeof html2pdf === "undefined") {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Export mode to fix transparency colors
+    document.body.classList.add("export-mode");
+
+    const pdf = new jspdf.jsPDF({
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+      compress: true
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+
+    for (let i = 0; i < sections.length; i++) {
+      const el = document.querySelector(sections[i]);
+      if (!el) continue;
+
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        backgroundColor: "#222831"
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const imgHeight = (canvasHeight * pageWidth) / canvasWidth;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add first segment
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add more pages if section is longer
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = heightLeft - imgHeight;
+        pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+    }
+
+    const filename = (document.title || "portfolio")
+      .toLowerCase()
+      .replace(/\s+/g, "_") + ".pdf";
+
+    pdf.save(filename);
+
+    setTimeout(() => window.close(), 1200);
+
+  } catch (error) {
+    console.error("PDF export failed:", error);
+  }
+});
+</script>
+
+
 </html>
 `;
   };

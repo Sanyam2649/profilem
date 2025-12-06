@@ -8,10 +8,10 @@ const Bio = ({ Bio }) => {
   
   // Determine if text is long enough to need "Read More"
   const isLongText = Bio && Bio.length > 300
-  const displayText = isLongText && !isExpanded ? Bio.substring(0, 300) + '...' : Bio
+  const displayText = isLongText && !isExpanded ? Bio.substring(0, 500) + '...' : Bio
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen items-center justify-center text-white px-4 md:px-8">
+    <div className="flex flex-col md:flex-row w-full  items-center justify-center text-white px-4 md:px-8">
       
       {/* Left Text Section */}
       <div className="w-full md:w-1/2 p-4 md:p-8 lg:p-12 flex flex-col justify-center items-center order-2 md:order-1">

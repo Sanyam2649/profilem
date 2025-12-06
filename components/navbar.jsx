@@ -119,7 +119,7 @@ const Navbar = () => {
   const handleLogout = useCallback(() => {
     logout();
     setShowLogoutModal(false);
-    router.push('/login');
+    router.push('/');
   }, [logout, router]);
 
   const handleLoginSuccess = useCallback((userData) => {
